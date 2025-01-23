@@ -273,6 +273,7 @@ async def handle_send_invoice(deal_id: str, quote_id: str, email_params : dict, 
     email_response = send_email(email_params)
 
     if email_response.status_code == 200:
+        ZOHO_API.update_record(moduleName="Deals",id=deal_id,token=token,data={"data":[{"Stage":"Confirm Delivery"}]})
         slack_msg = f"""
                     📧💸 Sucessfully Sent Invoice to {email_params.get("to").get("user_name")}!  \n *Details:* \n - Order ID: `{order_id}` \n - Invoiced Amount (Per Vehicle): `CAD {invoice_amount}` \n - Volumn : `{len(vehicle_details)} Vehicles` \n <{url}|View Invoice>
                     """
