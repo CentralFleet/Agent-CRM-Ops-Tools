@@ -97,15 +97,16 @@ async def get_customer_or_carrier_contacts(email_type : str, carrier_id: str = N
             contacts_resp_v2 = ZOHO_API.fetch_related_list(moduleName="Accounts",record_id=customer_id,token=token,name="DealerContact")
             if contacts_resp_v2.status_code == 204:
                 contacts_resp_v1 = ZOHO_API.fetch_related_list(moduleName="Accounts",record_id=customer_id,token=token,name="Contacts12")
+                logger.info(contacts_resp_v1.json())
                 if contacts_resp_v1:
-                    for contact in contacts_resp_v1.json()['data']:
-                        contact_details = ZOHO_API.read_record(moduleName="Contacts",id=contact['Company']['id']).json().get('data', [{}])[0]
+                    for contact in contacts_resp_v1.json().get('data', [{}]):
+                        contact_details = ZOHO_API.read_record(moduleName="Contacts",id=contact['Company']['id'],token=token).json().get('data', [{}])[0]
                         email_collection[contact_details['Email']] = contact_details['Last_Name']
 
                 else:
                     return {"status":"failed","message":"No Email Found","error":str(e)}
             else:
-                for contact in contacts_resp_v2.json()['data']:
+                for contact in contacts_resp_v2.json().get('data', [{}]):
                     email_collection[contact['Email']] = contact['Last_Name']
 
         logger.info(f"Contact Email for requested Customer or Carrier is {email_collection}")
@@ -191,8 +192,6 @@ async def handle_send_dispatch_email(deal_id: str, quote_id: str, email_params :
 async def handle_send_quote_request(deal_id: str, quote_id : str, email_params : dict):
     token = TOKEN_INSTANCE.get_access_token()
     order_details = ZOHO_API.read_record(moduleName="Deals", id=deal_id, token=token).json().get("data", [{}])[0]
-    attachments = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Attachments").json().get("data", [])                     
-    quote_details = ZOHO_API.read_record(moduleName="Transport_Offers",id=quote_id,token=token).json().get("data", [])[0]    
     vehicle_details = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Vehicles").json().get("data", [])
     
     vehicle_rows = EmailUtils.build_vehicle_rows(vehicle_details)
@@ -218,8 +217,6 @@ async def handle_send_quote_request(deal_id: str, quote_id : str, email_params :
 async def handle_send_quote(deal_id: str, quote_id : str, email_params : dict, customerprice: str):
     token = TOKEN_INSTANCE.get_access_token()
     order_details = ZOHO_API.read_record(moduleName="Deals", id=deal_id, token=token).json().get("data", [{}])[0]
-    attachments = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Attachments").json().get("data", [])                     
-    quote_details = ZOHO_API.read_record(moduleName="Transport_Offers",id=quote_id,token=token).json().get("data", [])[0]    
     vehicle_details = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Vehicles").json().get("data", [])
     
     vehicle_rows = EmailUtils.build_vehicle_rows(vehicle_details)
@@ -239,7 +236,6 @@ async def handle_send_invoice(deal_id: str, quote_id: str, email_params : dict, 
     token = TOKEN_INSTANCE.get_access_token()
     order_details = ZOHO_API.read_record(moduleName="Deals", id=deal_id, token=token).json().get("data", [{}])[0]
     attachments = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Attachments").json().get("data", [])                     
-    quote_details = ZOHO_API.read_record(moduleName="Transport_Offers",id=quote_id,token=token).json().get("data", [])[0]    
     vehicle_details = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Vehicles").json().get("data", [])
     
     file_id = None
