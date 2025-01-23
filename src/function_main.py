@@ -93,7 +93,7 @@ async def get_customer_or_carrier_contacts(email_type : str, carrier_id: str = N
                             email_collection[contact['Email']] = contact['Last_Name']
 
 
-        elif email_type == "SendQuote" or email_type == "Invoice":
+        elif email_type == "SendQuote" or email_type == "SendInvoice":
             contacts_resp_v2 = ZOHO_API.fetch_related_list(moduleName="Accounts",record_id=customer_id,token=token,name="DealerContact")
             if contacts_resp_v2.status_code == 204:
                 contacts_resp_v1 = ZOHO_API.fetch_related_list(moduleName="Accounts",record_id=customer_id,token=token,name="Contacts12")
