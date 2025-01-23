@@ -125,7 +125,7 @@ async def send_emails(req: func.HttpRequest, context: func.Context) -> func.Http
             "html_content": None,
             "subject": None,
             "to": {
-                "user_name": data.get("receivername"),
+                "user_name": data.get("ToName"),
                 "email": data.get("ToEmail")
             },
             "zoho_deal_id": data.get("Deal_ID"),

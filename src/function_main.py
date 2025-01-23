@@ -67,7 +67,7 @@ async def create_and_send_quote(data):
     quote_crm_response = send_quote_to_crm()
     quote_id = quote_crm_response['data'][0]['details']['id']
     sql_response = send_quote_to_sql(quote_id=quote_id)
-
+    ZOHO_API.update_record(moduleName="Deals",id=data.get('DealID'),token=token,data={"data":[{"Stage":"Send Quote to Customer"}]})
     return {
             "status":"success",
             "quote_create_response":{
@@ -98,14 +98,14 @@ async def get_customer_or_carrier_contacts(email_type : str, carrier_id: str = N
             if contacts_resp_v2.status_code == 204:
                 contacts_resp_v1 = ZOHO_API.fetch_related_list(moduleName="Accounts",record_id=customer_id,token=token,name="Contacts12")
                 if contacts_resp_v1:
-                    for contact in contacts_resp_v1['data']:
-                        contact_details = ZOHO_API.read_record(moduleName="Contacts",id=contact['Company']['id']).get('data', [{}])[0]
+                    for contact in contacts_resp_v1.json()['data']:
+                        contact_details = ZOHO_API.read_record(moduleName="Contacts",id=contact['Company']['id']).json().get('data', [{}])[0]
                         email_collection[contact_details['Email']] = contact_details['Last_Name']
 
                 else:
                     return {"status":"failed","message":"No Email Found","error":str(e)}
             else:
-                for contact in contacts_resp_v2['data']:
+                for contact in contacts_resp_v2.json()['data']:
                     email_collection[contact['Email']] = contact['Last_Name']
 
         logger.info(f"Contact Email for requested Customer or Carrier is {email_collection}")
