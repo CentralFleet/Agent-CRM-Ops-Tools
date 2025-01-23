@@ -136,7 +136,7 @@ async def send_emails(req: func.HttpRequest, context: func.Context) -> func.Http
             "QuoteRequest": (handle_send_quote_request, ["Deal_ID", "Quote_ID", "email_params"]),
             "Dispatch": (handle_send_dispatch_email, ["Deal_ID", "Quote_ID", "email_params"]),
             "SendQuote": (handle_send_quote, ["Deal_ID", "Quote_ID", "email_params", "CustomerPrice_ExclTax"]),
-            "Invoice": (handle_send_invoice, ["Deal_ID", "Quote_ID", "email_params","Invoiced_Amount"])
+            "SendInvoice": (handle_send_invoice, ["Deal_ID", "Quote_ID", "email_params","Invoiced_Amount"])
         }
 
         # Get the handler and expected arguments
