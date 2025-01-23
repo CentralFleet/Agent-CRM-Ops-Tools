@@ -167,7 +167,7 @@ async def handle_send_dispatch_email(deal_id: str, quote_id: str, email_params :
     vehicle_details = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Vehicles").json().get("data", [])
     
     vehicle_rows = EmailUtils.build_vehicle_rows(vehicle_details)    
-    email_params["subject"] = f"New Transport Request: [{order_details.get("PickupLocation")} -> {order_details.get("Drop_off_Location")}]"
+    email_params["subject"] = f"New Transport Request: [{order_details.get('PickupLocation')} -> {order_details.get('Drop_off_Location')}]"
     email_params["attachment_ids"] = [attachment.get("$file_id") for attachment in attachments]
     assigned_carrier = FunctionalUtils.design_carrirer_body(quote_details)                                        # Assigned Carrier
     email_params["html_content"] = EmailUtils.get_dispatch_content(order_details, vehicle_rows, email_params.get("to").get("user_name"),
@@ -196,7 +196,7 @@ async def handle_send_quote_request(deal_id: str, quote_id : str, email_params :
     vehicle_details = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Vehicles").json().get("data", [])
     
     vehicle_rows = EmailUtils.build_vehicle_rows(vehicle_details)
-    email_params["subject"] = f"Request for Transport Quote: [{order_details.get("Drop_off_Location")} -> {order_details.get("Drop_off_Location")}]"
+    email_params["subject"] = f"Request for Transport Quote: [{order_details.get('Drop_off_Location')} -> {order_details.get('Drop_off_Location')}]"
     email_params["html_content"] = EmailUtils.get_QR_content(order_details, 
                                                          vehicle_rows, 
                                                          email_params.get("to").get("user_name"))
@@ -205,7 +205,7 @@ async def handle_send_quote_request(deal_id: str, quote_id : str, email_params :
     email_response = send_email(email_params, token)
     if email_response.status_code == 200:
         slack_msg = f"""
-                    📧📜 {datetime.now()} *Email Sent Successfully!*  \n *Details:* \n - Order ID: `{order_details.get("Deal_Name")}` \n - Email Type: `QuoteRequest` \n - Email Subject: '{email_params["subject"]}' 
+                    📧📜 {datetime.now()} *Email Sent Successfully!*  \n *Details:* \n - Order ID: `{order_details.get('Deal_Name')}` \n - Email Type: `QuoteRequest` \n - Email Subject: '{email_params['subject']}` 
                 """
         FunctionalUtils.send_message_to_channel(os.getenv("BOT_TOKEN"), os.getenv("QUOTE_CHANNEL_ID"),slack_msg)
         return {"status":"success","message":"Successfully send Quote Request", "data":str(email_response.json()),"redirect_url": f"https://crm.zohocloud.ca/crm/org110000402423/tab/Deals/{deal_id}"}

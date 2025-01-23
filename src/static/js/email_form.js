@@ -103,14 +103,13 @@ function SendEmail() {
     const customerprice = document.getElementById("customerprice").value;
 
     const data = {
-        dealid: dealid, // Make sure deal_id is defined
-        carrierid: carrierid, // Make sure carrierid is defined
-        email: email || manualEmail,
-        email_type: emailtype,
-        quoteid: quoteid,
-        receivername : toname,
-        customerprice_excl_tax : customerprice,
-        invoiced_amount : invoiced_amount
+        Deal_ID: dealid, // Make sure deal_id is defined
+        Carrier_ID: carrierid, // Make sure carrierid is defined
+        ToEmail: email || manualEmail,
+        Quote_ID: quoteid,
+        ToName : toname,
+        CustomerPrice_ExclTax : customerprice,
+        Invoiced_Amount : invoiced_amount
 
     };
 

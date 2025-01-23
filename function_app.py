@@ -118,36 +118,29 @@ async def serve_static_file(req: func.HttpRequest, context: func.Context) -> fun
 @app.route(route="email/send",methods=['POST'])
 async def send_emails(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
     try:
-        email_type = req.params.get('type')
+        Email_Type = req.params.get('type')
         data = req.get_json()
-        # required parameters
-        deal_id = data.get("dealid")
-        quote_id = data.get("quoteid")
-        email_address = data.get("email")
-        carrier_id = data.get("carrierid")
-        receiver_name = data.get("receivername")
-        customer_price_excl_tax = data.get("customerprice_excl_tax")
           
         email_params = {
             "html_content": None,
             "subject": None,
             "to": {
                 "user_name": data.get("receivername"),
-                "email": data.get("email")
+                "email": data.get("ToEmail")
             },
-            "zoho_deal_id": data.get("dealid"),
+            "zoho_deal_id": data.get("Deal_ID"),
             "attachment_ids": None
         }
         
         handlers = {
-            "QuoteRequest": (handle_send_quote_request, ["dealid", "quoteid", "email_params"]),
-            "Dispatch": (handle_send_dispatch_email, ["dealid", "quoteid", "email_params"]),
-            "SendQuote": (handle_send_quote, ["dealid", "quoteid", "email_params", "customerprice_excl_tax"]),
-            "Invoice": (handle_send_invoice, ["dealid", "quoteid", "email_params","invoice_amount"])
+            "QuoteRequest": (handle_send_quote_request, ["Deal_ID", "Quote_ID", "email_params"]),
+            "Dispatch": (handle_send_dispatch_email, ["Deal_ID", "Quote_ID", "email_params"]),
+            "SendQuote": (handle_send_quote, ["Deal_ID", "Quote_ID", "email_params", "CustomerPrice_ExclTax"]),
+            "Invoice": (handle_send_invoice, ["Deal_ID", "Quote_ID", "email_params","Invoiced_Amount"])
         }
 
         # Get the handler and expected arguments
-        handler_info = handlers.get(email_type)
+        handler_info = handlers.get(Email_Type)
         if not handler_info:
             raise ValueError("Invalid email type provided.")
         
