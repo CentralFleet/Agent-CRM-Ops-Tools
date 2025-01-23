@@ -276,7 +276,7 @@ async def handle_send_invoice(deal_id: str, quote_id: str, email_params : dict, 
         email_params["subject"] = f"Invoice for Order {order_id}"
         email_params["html_content"] = EmailUtils.get_invoice_html(order_id, email_params.get("to").get("user_name"))
 
-    email_response = send_email(email_params)
+    email_response = send_email(email_params,token)
 
     if email_response.status_code == 200:
         ZOHO_API.update_record(moduleName="Deals",id=deal_id,token=token,data={"data":[{"Stage":"Confirm Delivery"}]})
