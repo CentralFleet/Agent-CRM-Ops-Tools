@@ -1,0 +1,121 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+    color: #444;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.form-container {
+    max-width: 430px;
+    height: 350px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 60px 10px 20px 10px;
+    /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.3s ease;
+    position: relative;
+}
+.form-container:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+select,
+input[type="email" ] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 40px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+select,
+input[id="customerprice" ] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 30px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+
+
+button {
+    font-family: 'Courier New', Courier, monospace;
+    width: 100%;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+.form-actions {
+    margin-top: 20px;
+}
+
+.email:disabled {
+    background-color: #ccc;  /* Light gray */
+    color: #666;  /* Darker gray for text */
+    cursor: not-allowed;  /* Change cursor to indicate that it's disabled */
+}
+
+.loading-spinner {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 45%;
+    transform: translate(-50%, -50%);
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2a5eec;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    z-index: 10; /* Ensures it stays on top of other elements */
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+h3 {
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center; /* Align Carrier Name to center */
+    color: #333; /* Optional: Change text color */
+    margin-bottom: 20px; /* Optional: Add space below the heading */
+}
+
+
+
+#invoiceprice{
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+}

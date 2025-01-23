@@ -1,0 +1,115 @@
+  /* Existing CSS */
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #eaeaea;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.quote-form {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 30px;
+    width: 400px;
+    height: 400px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.3s ease;
+    position: relative;
+}
+.quote-form:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+h2 {
+    color: #333333;
+    margin-bottom: 25px;
+    font-size: 22px;
+    font-weight: 600;
+}
+#priceunit {
+    width: 25%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    margin-right: 5px;
+    transition: border-color 0.3s ease;
+    outline: none;
+}
+
+
+
+input[type="text"] {
+    width: 90%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+    outline: none;
+}
+input[type="text"]:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(209, 71, 163, 0.3);
+}
+.range-input {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.range-input input {
+    width: 42%;
+    margin-bottom: 0;
+}
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+button:hover {
+    background-color: #007bff;
+    transform: translateY(-2px);
+}
+button:active {
+    transform: translateY(0);
+}
+label {
+    color: #555555;
+    font-size: 14px;
+    text-align: left;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Loading Spinner CSS */
+/* Loading Spinner CSS */
+.loading-spinner {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    z-index: 10; /* Ensures it stays on top of other elements */
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

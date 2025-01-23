@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quote</title>
+  <link rel="stylesheet" href="/api/static?filename=create_quote.css">
+</head>
+
+<body data-carrierid="{{carrierID}}" data-jobid="{{jobID}}">
+    <div class="quote-form">
+        <h2 data-carriername="{{carriername}}">Create Quote : {{carriername}}</h2>
+        <label for="estimatedAmount">Estimated Amount: (Per Vehicle)</label>
+        <div style="display: flex; align-items: center;" class="pricing-input">
+            <select id="priceunit" name="priceunit">
+                <option value="usd-unit">CAD</option>
+                <option value="cad-unit">USD</option>
+            </select>
+            <input type="text" id="estimatedAmount" placeholder="Enter Estimated Amount">
+        </div>
+        
+        <label for="estimatedPickup">Estimated Pickup (Days):</label>
+        <div class="range-input">
+            <input type="text" id="pickupMin" placeholder="Min (days)" />
+            <input type="text" id="pickupMax" placeholder="Max (days)" />
+        </div>
+        <label for="deliveryDate">Delivery Date (Days):</label>
+        <div class="range-input">
+            <input type="text" id="deliveryMin" placeholder="Min (days)" />
+            <input type="text" id="deliveryMax" placeholder="Max (days)" />
+        </div>
+        <button onclick="submitQuote()">Submit</button>
+        <div class="loading-spinner" id="loadingSpinner"></div>
+    </div>
+
+    <script src = "/api/static?filename=create_quote.js"></script>
+</body>
+</html>
