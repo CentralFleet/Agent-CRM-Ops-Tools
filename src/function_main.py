@@ -163,13 +163,23 @@ def send_email(email_data : dict, token: str):
 async def handle_send_dispatch_email(deal_id: str, quote_id: str, email_params : dict):
     token = TOKEN_INSTANCE.get_access_token()
     order_details = ZOHO_API.read_record(moduleName="Deals", id=deal_id, token=token).json().get("data", [{}])[0]
-    attachments = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Attachments").json().get("data", [])                     
+    try:
+        attachments = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Attachments").json().get("data", [])  
+        email_params["attachment_ids"] = list()
+        for attachment in attachments:
+            file__name = attachment.get("File_Name")
+            if f"INVOICE-{order_details.get('Deal_Name')}" not in file__name:
+                file_id = attachment.get("$file_id")
+                email_params["attachment_ids"].append(file_id)
+    except Exception as e:
+        email_params["attachment_ids"] = list()
+        logger.error(f"Error fetching attachments: {e}")
+              
     quote_details = ZOHO_API.read_record(moduleName="Transport_Offers",id=quote_id,token=token).json().get("data", [])[0]    
     vehicle_details = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Vehicles").json().get("data", [])
     
     vehicle_rows = EmailUtils.build_vehicle_rows(vehicle_details)    
     email_params["subject"] = f"New Transport Request: [{order_details.get('PickupLocation')} -> {order_details.get('Drop_off_Location')}]"
-    email_params["attachment_ids"] = [attachment.get("$file_id") for attachment in attachments]
     assigned_carrier = FunctionalUtils.design_carrirer_body(quote_details)                                        # Assigned Carrier
     email_params["html_content"] = EmailUtils.get_dispatch_content(order_details, vehicle_rows, email_params.get("to").get("user_name"),
                                                                    assigned_carrier['Est_Pickup_Date_Range'],
