@@ -214,7 +214,7 @@ async def handle_send_quote_request(deal_id: str, quote_id : str, email_params :
     email_response = send_email(email_params, token)
     if email_response.status_code == 200:
         slack_msg = f"""
-                    📧📜 {datetime.now()} *Email Sent Successfully!*  \n *Details:* \n - Order ID: `{order_details.get('Deal_Name')}` \n - Email Type: `QuoteRequest` \n - Email Subject: '{email_params['subject']}` 
+                    📧📜 {datetime.now()} *Email Sent Successfully!*  \n *Details:* \n - To: `{email_params.get("to").get("user_name")}` \n - Order ID: `{order_details.get('Deal_Name')}` \n - Email Type: `QuoteRequest` \n - Email Subject: '{email_params['subject']}` 
                 """
         FunctionalUtils.send_message_to_channel(os.getenv("BOT_TOKEN"), os.getenv("QUOTE_CHANNEL_ID"),slack_msg)
         return {"status":"success","message":"Successfully send Quote Request", "data":str(email_response.json()),"redirect_url": f"https://crm.zohocloud.ca/crm/org110000402423/tab/Deals/{deal_id}"}
