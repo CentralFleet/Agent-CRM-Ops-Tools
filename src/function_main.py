@@ -205,7 +205,7 @@ async def handle_send_quote_request(deal_id: str, quote_id : str, email_params :
     vehicle_details = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Vehicles").json().get("data", [])
     
     vehicle_rows = EmailUtils.build_vehicle_rows(vehicle_details)
-    email_params["subject"] = f"Request for Transport Quote: [{order_details.get('Drop_off_Location')} -> {order_details.get('Drop_off_Location')}]"
+    email_params["subject"] = f"Request for Transport Quote: [{order_details.get('PickupLocation')} -> {order_details.get('Drop_off_Location')}]"
     email_params["html_content"] = EmailUtils.get_QR_content(order_details, 
                                                          vehicle_rows, 
                                                          email_params.get("to").get("user_name"))
