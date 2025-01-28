@@ -209,7 +209,7 @@ class EmailUtils:
                 <p>Best regards,</p>
                 <p><strong>Central Fleet Dispatch Team</strong></p>
                 <p>Email: orders@centralfleet.ca</p>
-                <p>Phone: 514-989-0749</p>
+                <p>Phone: 438-884-7462</p>
             </body>
         </html>
         """
@@ -254,7 +254,7 @@ class EmailUtils:
                 <p>Best regards,</p>
                 <p><strong>Central Fleet Dispatch Team</strong></p>
                 <p>Email: orders@centralfleet.ca</p>
-                <p>Phone: 514-989-0749</p>
+                <p>Phone: 438-884-7462</p>
             </body>
         </html>
         """
@@ -274,7 +274,7 @@ class EmailUtils:
                 <p>Best regards,</p>
                 <p><strong>Central Fleet Dispatch Team</strong></p>
                 <p>Email: orders@centralfleet.ca</p>
-                <p>Phone: 514-989-0749</p>
+                <p>Phone: 438-884-7462</p>
             </body>
         </html>
         """
