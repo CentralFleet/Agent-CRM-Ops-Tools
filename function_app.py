@@ -28,7 +28,8 @@ async def get_quote_form(req: func.HttpRequest, context: func.Context) -> func.H
         params = {
             "carrierID": req.params.get('carrierID'),
             "jobID": req.params.get('jobID'),
-            "carriername": req.params.get('carriername')
+            "carriername": req.params.get('carrierName'),
+            "potentialID": req.params.get('potentialID')
         }
         filepath = os.path.join(context.function_directory, "src/static/create_quote.html")
         html_content = FunctionalUtils.render_html_template(filepath, params)

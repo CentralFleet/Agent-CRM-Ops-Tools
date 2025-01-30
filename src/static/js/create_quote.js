@@ -65,6 +65,7 @@ function submitQuote() {
 
     const carrierID = document.body.dataset.carrierid;
     const jobID = document.body.dataset.jobid;
+    const potentialID = document.body.dataset.potentialid;
     const data = {
         Estimated_Amount: estimatedAmount,
         EstimatedPickupRange: estimated_pickup,
@@ -72,7 +73,8 @@ function submitQuote() {
         CarrierID: carrierID,
         DealID: jobID,
         currency: currency_unit,
-        carrierName: carrierName
+        carrierName: carrierName,
+        PotentialID: potentialID
     };
 
     fetch("/api/quote/create", {
