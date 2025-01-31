@@ -80,7 +80,8 @@ async def get_email_form(req: func.HttpRequest, context: func.Context) -> func.H
         "customerid": req.params.get('CustomerID', ''),
         "email_type": req.params.get('email_type'),
         "ToName": req.params.get('toname', ''),
-        "invoice_price": req.params.get('invoice_price', '')
+        "invoice_price": req.params.get('invoice_price', ''),
+        "potentialID": req.params.get('potentialID')
     }
     filepath = os.path.join(context.function_directory, "src/static/email_form.html")
     try:
@@ -134,7 +135,7 @@ async def send_emails(req: func.HttpRequest, context: func.Context) -> func.Http
         }
         
         handlers = {
-            "QuoteRequest": (handle_send_quote_request, ["Deal_ID", "Quote_ID", "email_params"]),
+            "QuoteRequest": (handle_send_quote_request, ["Deal_ID", "email_params","potentialID"]),
             "Dispatch": (handle_send_dispatch_email, ["Deal_ID", "Quote_ID", "email_params"]),
             "SendQuote": (handle_send_quote, ["Deal_ID", "Quote_ID", "email_params", "CustomerPrice_ExclTax"]),
             "SendInvoice": (handle_send_invoice, ["Deal_ID", "Quote_ID", "email_params","Invoiced_Amount"])

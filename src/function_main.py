@@ -200,7 +200,7 @@ async def handle_send_dispatch_email(deal_id: str, quote_id: str, email_params :
         return {"status":"failed","message":"Failed to send Dispatch Email", "error":str(email_response)}
    
 
-async def handle_send_quote_request(deal_id: str, quote_id : str, email_params : dict):
+async def handle_send_quote_request(deal_id: str, email_params : dict, potentialid : str):
     token = TOKEN_INSTANCE.get_access_token()
     order_details = ZOHO_API.read_record(moduleName="Deals", id=deal_id, token=token).json().get("data", [{}])[0]
     vehicle_details = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Vehicles").json().get("data", [])
@@ -218,6 +218,7 @@ async def handle_send_quote_request(deal_id: str, quote_id : str, email_params :
                     📧📜 {datetime.now()} *Email Sent Successfully!*  \n *Details:* \n - To: `{email_params.get("to").get("user_name")}` \n - Order ID: `{order_details.get('Deal_Name')}` \n - Email Type: `QuoteRequest` \n - Email Subject: '{email_params['subject']}` 
                 """
         FunctionalUtils.send_message_to_channel(os.getenv("BOT_TOKEN"), os.getenv("QUOTE_CHANNEL_ID"),slack_msg)
+        ZOHO_API.update_record(moduleName="Potential_Carrier", id=potentialid ,token=token,data={"data":[{"Progress_Status":"Connected"}]})
         return {"status":"success","message":"Successfully send Quote Request", "data":str(email_response.json()),"redirect_url": f"https://crm.zohocloud.ca/crm/org110000402423/tab/Deals/{deal_id}"}
     else:
         logger.error(f"Error sending email: {email_response.text}")

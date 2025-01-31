@@ -10,6 +10,7 @@ const customerid = document.body.getAttribute('data-customerid');
 const quoteid = document.body.getAttribute('data-quoteid');
 const toname = document.body.getAttribute('data-toname');
 const invoiced_amount = document.body.getAttribute('data-invoicedprice');
+const potentialID = document.body.getAttribute('data-potentialid');
 
 if (emailtype == "Dispatch") {
         formTitle.textContent = "Dispatch Form";
@@ -109,7 +110,8 @@ function SendEmail() {
         Quote_ID: quoteid,
         ToName : toname,
         CustomerPrice_ExclTax : customerprice,
-        Invoiced_Amount : invoiced_amount
+        Invoiced_Amount : invoiced_amount,
+        potentialID : potentialID
 
     };
 
