@@ -68,7 +68,10 @@ async def create_and_send_quote(data):
     quote_id = quote_crm_response['data'][0]['details']['id']
     sql_response = send_quote_to_sql(quote_id=quote_id)
     ZOHO_API.update_record(moduleName="Deals",id=data.get('DealID'),token=token,data={"data":[{"Stage":"Send Quote to Customer","Order_Status":"Quote Ready"}]})
-    ZOHO_API.update_record(moduleName="Potential_Carrier",id=data.get('PotentialID'),token=token,data={"data":[{"Progress_Status":"Quote Received"}]})
+    ZOHO_API.update_record(moduleName="Potential_Carrier",id=data.get('PotentialID'),token=token,data={"data":[{"Progress_Status":"Quote Received",
+                                                                                                                "Est_Delivery_Date":data.get('DeliveryDate'),
+                                                                                                                "Est_Pickup_Date":data.get('EstimatedPickupRange'),
+                                                                                                                "Estimated_Amount":data.get('Estimated_Amount')}]} )
     return {
             "status":"success",
             "quote_create_response":{
