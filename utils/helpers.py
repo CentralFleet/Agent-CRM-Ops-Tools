@@ -310,7 +310,7 @@ class EmailUtils:
         </head>
         <body>
             <p>Dear <strong>{receiver_name}</strong>,</p>
-            <p>We currently have transportation orders and are seeking the most competitive quotes. Could you please provide your best quote for the shipments listed below?</p>
+            <p>We currently have transportation orders and are seeking the most competitive quotes. Could you please provide your best price for the shipments listed below, along with the earliest possible pickup and delivery dates?</p>
             <table border="1" cellpadding="5" cellspacing="0" width="100%">
                 <thead>
                     <tr>
