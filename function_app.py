@@ -10,7 +10,8 @@ from src.function_main import (
     handle_send_quote_request,
     handle_send_dispatch_email,
     handle_send_quote,
-    handle_send_invoice
+    handle_send_invoice,
+    handle_bulk_quote_request
 )
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -90,7 +91,6 @@ async def get_email_form(req: func.HttpRequest, context: func.Context) -> func.H
     except Exception:
         return func.HttpResponse("Internal Server Error", status_code=500)
 
-
 @app.route(route="static", methods=["GET"])
 async def serve_static_file(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
     """
@@ -130,15 +130,15 @@ async def send_emails(req: func.HttpRequest, context: func.Context) -> func.Http
                 "user_name": data.get("ToName"),
                 "email": data.get("ToEmail")
             },
-            "zoho_deal_id": data.get("Deal_ID"),
             "attachment_ids": None
         }
-        
+        logging.info(Email_Type)
         handlers = {
             "QuoteRequest": (handle_send_quote_request, ["Deal_ID", "email_params","potentialID"]),
             "Dispatch": (handle_send_dispatch_email, ["Deal_ID", "Quote_ID", "email_params"]),
             "SendQuote": (handle_send_quote, ["Deal_ID", "Quote_ID", "email_params", "CustomerPrice_ExclTax"]),
-            "SendInvoice": (handle_send_invoice, ["Deal_ID", "Quote_ID", "email_params","Invoiced_Amount"])
+            "SendInvoice": (handle_send_invoice, ["Deal_ID", "Quote_ID", "email_params","Invoiced_Amount"]),
+            "BulkQuoteRequest": (handle_bulk_quote_request, ["Carrier_ID", "email_params", "potentialID"])
         }
 
         # Get the handler and expected arguments
@@ -151,9 +151,12 @@ async def send_emails(req: func.HttpRequest, context: func.Context) -> func.Http
         args = [email_params if key == "email_params" else data.get(key) for key in arg_keys]
 
         response = await handler(*args)
-
         return func.HttpResponse(json.dumps(response), mimetype="application/json", status_code=200)
      
     except Exception as e:
         logging.exception("Error in Send Email endpoint")
         return func.HttpResponse(json.dumps({"status":"failed","message":"Internal Server Error","error":str(e)}))
+    
+
+
+

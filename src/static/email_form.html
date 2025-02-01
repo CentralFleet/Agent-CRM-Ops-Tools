@@ -4,35 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dispatch Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/api/static?filename=email_form.css">
 </head>
 <body data-dealid="{{dealid}}" data-carrierid="{{carrierid}}" data-customerid="{{customerid}}" data-emailtype="{{email_type}}" data-quoteid="{{quoteid}}" data-toname="{{ToName}}" data-invoicedprice="{{invoice_price}}" data-potentialid="{{potentialID}}">
-    <h1 id="form-title"></h1>
-    <h3>To : {{ToName}}</h3>
-    <div class="form-container">
-        <form id="dispatchForm">
-            <label for="email">Choose Email:</label>
-            <select id="email" name="email">
-                <option value="">--Please choose an email--</option>
-            </select>
+    <div class="page-container">
+        <h1 id="form-title"></h1>
+        <h3>Recipient: {{ToName}}</h3>
+        <div class="form-container">
+            <form id="dispatchForm">
+                <div class="form-group">
+                    <label for="email">Choose Email:</label>
+                    <select id="email" name="email">
+                        <option value="">--Please choose an email--</option>
+                    </select>
+                </div>
 
-            <label for="manualEmail">Enter Email(Optional):</label>
-            <input type="email" id="manualEmail" name="manualEmail" placeholder="Enter email">
-            <!-- Add a hidden input field for the customer price -->
-            <label id="customerpricelabel"></label>
-            <input type="hidden" id="customerprice" name="customerprice" placeholder="Enter customer price (Per Vehicle)" required>
-            <!-- Add a hidden label for the invoiced price -->
-            <p type="hidden" id="invoiceprice" name="invoiceprice" hidden>Invoiced Price (Per Vehicle) : {{invoice_price}}</p>
+                <div class="form-group">
+                    <label for="manualEmail">Enter Email (Optional):</label>
+                    <input type="email" id="manualEmail" name="manualEmail" placeholder="Enter email address">
+                </div>
 
+                <label id="customerpricelabel"></label>
+                <input type="hidden" id="customerprice" name="customerprice" placeholder="Enter customer price (Per Vehicle)" required>
+                
+                <p type="hidden" id="invoiceprice" name="invoiceprice" hidden>Invoiced Price (Per Vehicle): {{invoice_price}}</p>
 
-
-            <div class="form-actions">
-                <button id ="submit-button"></button>
-                <div class="loading-spinner" id="loadingSpinner"></div>
-            </div>
-        </form>
+                <div class="form-actions">
+                    <button id="submit-button"></button>
+                    <div class="loading-spinner" id="loadingSpinner"></div>
+                </div>
+            </form>
+        </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/api/static?filename=email_form.js"></script>
 </body>
 </html>

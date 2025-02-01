@@ -1,121 +1,250 @@
-body {
-    font-family: Arial, sans-serif;
+:root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --bg-gradient: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+}
+
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
-    color: #333;
-    font-family: 'Courier New', Courier, monospace;
+}
+
+body {
+    margin: 0;
+    padding: 2rem;
+    min-height: 100vh;
+    background:white;
+    color: #2d3748;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 h1 {
-    text-align: center;
-    margin-top: 20px;
-    color: #444;
-    font-family: 'Courier New', Courier, monospace;
+text-align: center;
+margin-bottom: 1.5rem;
+font-weight: 700; /* Bold weight for emphasis */
+font-size: 3rem; /* Slightly larger font size */
+letter-spacing: -0.025em;
+background: linear-gradient(135deg, #6366f1, #4f46e5); /* Gradient text */
+-webkit-background-clip: text; /* Clip text to background */
+-webkit-text-fill-color: transparent; /* Make text transparent to show gradient */
+text-shadow: 0 2px 4px rgba(99, 102, 241, 0.1); /* Subtle shadow for depth */
+position: relative;
+display: inline-block;
+}
+
+h1::after {
+content: '';
+position: absolute;
+left: 50%;
+bottom: -10px;
+width: 60%;
+height: 3px;
+background: linear-gradient(135deg, #6366f1, #4f46e5); /* Gradient underline */
+transform: translateX(-50%);
+border-radius: 2px;
+}
+
+h3 {
+text-align: center;
+margin-bottom: 2.5rem;
+font-weight: 500; /* Medium weight for subtlety */
+font-size: 1.25rem; /* Moderate font size */
+color: #4f46e5; /* Solid color for contrast */
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 0.5rem; /* Space between icon and text */
+}
+
+h3::before {
+content: '👤'; /* Add a user icon */
+font-size: 1.2rem; /* Slightly larger icon */
 }
 
 .form-container {
-    max-width: 430px;
-    height: 350px;
-    margin: 20px auto;
-    background: #fff;
-    padding: 60px 10px 20px 10px;
-    /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: box-shadow 0.3s ease;
+    width: min(100%, 480px);
+    background: white;
+    backdrop-filter: blur(20px);
+    padding: 2.5rem;
+    border-radius: 24px;
+    border: 1px solid rgba(99, 102, 241, 0.1);
+    box-shadow: 
+        0 4px 6px -1px rgba(99, 102, 241, 0.05),
+        0 10px 15px -3px rgba(99, 102, 241, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 20px 25px -5px rgba(99, 102, 241, 0.1),
+        0 10px 10px -5px rgba(99, 102, 241, 0.04);
+}
+
+.form-group {
+    margin-bottom: 1.75rem;
     position: relative;
 }
-.form-container:hover {
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-}
+
 label {
     display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    font-family: 'Courier New', Courier, monospace;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+    color: #4840a1;
+    font-size: 0.95rem;
+    letter-spacing: 0.025em;
 }
 
 select,
-input[type="email" ] {
-    width: calc(100% - 20px);
-    padding: 10px;
-    margin-bottom: 40px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-    font-family: 'Courier New', Courier, monospace;
+input[type="email"] {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 12px;
+    font-size: 1rem;
+    color: #2d3748;
+    background: #F8FAFC;
+    transition: all 0.2s ease;
+    font-family: inherit;
 }
 
-select,
-input[id="customerprice" ] {
-    width: calc(100% - 20px);
-    padding: 10px;
-    margin-bottom: 30px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-    font-family: 'Courier New', Courier, monospace;
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234338CA'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.5em;
+    padding-right: 2.5rem;
 }
 
+select:focus,
+input[type="email"]:focus {
+    outline: none;
+    border-color: #4840a1;
+    box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.1);
+    background: white;
+}
 
+::placeholder {
+    color: #94A3B8;
+}
 
 button {
-    font-family: 'Courier New', Courier, monospace;
     width: 100%;
-    background: #007bff;
+    background: linear-gradient(135deg, #4840a1 0%, #6366F1 100%);
     color: white;
     border: none;
-    padding: 10px;
-    font-size: 18px;
-    border-radius: 4px;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 12px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+    transition: 0.5s;
 }
 
 button:hover {
-    background: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.2);
+}
+
+button:hover::before {
+    transform: translateX(100%);
+}
+
+button:active {
+    transform: translateY(0);
 }
 
 .form-actions {
-    margin-top: 20px;
-}
-
-.email:disabled {
-    background-color: #ccc;  /* Light gray */
-    color: #666;  /* Darker gray for text */
-    cursor: not-allowed;  /* Change cursor to indicate that it's disabled */
+    position: relative;
+    margin-top: 2rem;
 }
 
 .loading-spinner {
     display: none;
     position: absolute;
     top: 50%;
-    left: 45%;
+    left: 50%;
     transform: translate(-50%, -50%);
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #2a5eec;
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    z-index: 10; /* Ensures it stays on top of other elements */
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
 }
+
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
 }
 
-h3 {
-    font-family: 'Courier New', Courier, monospace;
-    text-align: center; /* Align Carrier Name to center */
-    color: #333; /* Optional: Change text color */
-    margin-bottom: 20px; /* Optional: Add space below the heading */
+select:disabled {
+    background-color: #F1F5F9;
+    color: #94A3B8;
+    cursor: not-allowed;
 }
 
+#invoiceprice {
+    font-weight: 500;
+    color: #4840a1;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.025em;
+}
 
+option {
+    background-color: white;
+    color: #2d3748;
+    padding: 0.5rem;
+}
 
-#invoiceprice{
-    font-family: 'Courier New', Courier, monospace;
-    font-weight: bold;
+@media (max-width: 640px) {
+    body {
+        padding: 1rem;
+    }
+
+    .form-container {
+        padding: 1.5rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    h3 {
+        font-size: 1.125rem;
+        margin-bottom: 2rem;
+    }
 }

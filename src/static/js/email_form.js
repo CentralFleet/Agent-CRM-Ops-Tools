@@ -11,14 +11,14 @@ const quoteid = document.body.getAttribute('data-quoteid');
 const toname = document.body.getAttribute('data-toname');
 const invoiced_amount = document.body.getAttribute('data-invoicedprice');
 const potentialID = document.body.getAttribute('data-potentialid');
-
+console.log("emailtype", emailtype);
 if (emailtype == "Dispatch") {
-        formTitle.textContent = "Dispatch Form";
-        submit_button.textContent = "Send Dispatch";
+        formTitle.textContent = "New Dispatch";
+        submit_button.textContent = "Dispatch";
 
     }else if (emailtype == "QuoteRequest") {
-        formTitle.textContent = "Quote Request Form";
-        submit_button.textContent = "Send Quote Request";
+        formTitle.textContent = "New Quote Request";
+        submit_button.textContent = "Request Quote";
 
     }else if (emailtype == "SendQuote") {
         const inputField = document.getElementById("customerprice");
@@ -30,9 +30,13 @@ if (emailtype == "Dispatch") {
         customerpricelabel.textContent = "Customer Price (Excl. Tax):";
 
     }else if (emailtype == "SendInvoice") {
-        formTitle.textContent == "Invoice Prep Form";
+        formTitle.textContent == "Invoice Preparation";
         submit_button.textContent = "Send Invoice";
+
         document.getElementById('invoiceprice').hidden = false;
+    }else if (emailtype == "BulkQuoteRequest") {
+        formTitle.textContent = "New Bulk Quote Request";
+        submit_button.textContent = "Send Bulk Request";
     }
 emailDropdown.disabled = true;
 
@@ -126,18 +130,37 @@ function SendEmail() {
     .then(data => {
         loadingSpinner.style.display = "none"; // Hide loading spinner
         if (data.status == "success") {
-            alert("Email sent successfully!"); // Assuming 'success' field is part of the response data
-            window.opener.location.href = data.redirect_url;
-            window.close();
+            Swal.fire({
+                icon: "success",
+                title: "Email Sent!",
+                toast: true,  // Makes it smaller
+                position: "top-end", // Moves to top-right
+                showConfirmButton: false,
+                timer: 2000, // Auto-closes in 2 sec
+                timerProgressBar: true,
+                text: "The email has been sent successfully.",
+                confirmButtonText: "OK"
+            }).then(() => {
+                window.opener.location.href = data.redirect_url;
+                window.close();
+            });
         } else {
-            alert("Failed to send email.");
+            Swal.fire({
+                icon: "error",
+                title: "Failed to Send Email",
+                text: "Something went wrong. Please try again."
+            });
         }
 
     })
     .catch(error => {
         loadingSpinner.style.display = "none"; // Hide loading spinner
         console.error("Error sending email:", error);
-        alert("An error occurred while sending the dispatch email. "+ error);
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "An error occurred while sending the email. " + error
+        });
     });
 }
 
