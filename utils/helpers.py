@@ -281,83 +281,83 @@ class EmailUtils:
 
         return content
     
-    # @classmethod 
-    # def get_bulk_quote_html(cls, html_data, receiver_name):
-    #     """
-    #     Generates a plain HTML table with grouped pickup/dropoff locations, order names, and vehicles.
+    @classmethod 
+    def get_bulk_quote_html(cls, html_data, receiver_name):
+        """
+        Generates a plain HTML table with grouped pickup/dropoff locations, order names, and vehicles.
 
-    #     Args:
-    #         html_data (list): A list of dictionaries containing deal and vehicle information.
-    #         receiver_name (str): The name of the recipient.
+        Args:
+            html_data (list): A list of dictionaries containing deal and vehicle information.
+            receiver_name (str): The name of the recipient.
 
-    #     Returns:
-    #         str: The generated HTML as a string.
-    #     """
-    #     # Group vehicles by route (pickup + dropoff) and order name
-    #     grouped_data = defaultdict(list)
-    #     for deal in html_data:
-    #         route_key = (deal["PickupLocation"], deal["DropoffLocation"], deal["OrderName"])
-    #         grouped_data[route_key].extend(deal["Vehicles"])
+        Returns:
+            str: The generated HTML as a string.
+        """
+        # Group vehicles by route (pickup + dropoff) and order name
+        grouped_data = defaultdict(list)
+        for deal in html_data:
+            route_key = (deal["PickupLocation"], deal["DropoffLocation"], deal["OrderName"])
+            grouped_data[route_key].extend(deal["Vehicles"])
 
-    #     # Start building the HTML table
-    #     html_content = f"""
-    #     <!DOCTYPE html>
-    #     <html lang="en">
-    #     <head>
-    #         <meta charset="UTF-8">
-    #         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    #         <title>Deal Summary</title>
-    #     </head>
-    #     <body>
-    #         <p>Dear <strong>{receiver_name}</strong>,</p>
-    #         <p>We currently have transportation orders and are seeking the most competitive quotes. Could you please provide your best quote for the shipments listed below?</p>
-    #         <table border="1" cellpadding="5" cellspacing="0" width="100%">
-    #             <thead>
-    #                 <tr>
-    #                     <th>Order ID</th>
-    #                     <th>Vehicles</th>
-    #                     <th>Pickup Location</th>
-    #                     <th>Dropoff Location</th>
-    #                 </tr>
-    #             </thead>
-    #             <tbody>
-    #     """
+        # Start building the HTML table
+        html_content = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Deal Summary</title>
+        </head>
+        <body>
+            <p>Dear <strong>{receiver_name}</strong>,</p>
+            <p>We currently have transportation orders and are seeking the most competitive quotes. Could you please provide your best quote for the shipments listed below?</p>
+            <table border="1" cellpadding="5" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Vehicles</th>
+                        <th>Pickup Location</th>
+                        <th>Dropoff Location</th>
+                    </tr>
+                </thead>
+                <tbody>
+        """
 
-    #     # Add rows to the table
-    #     for (pickup, dropoff, order_name), vehicles in grouped_data.items():
-    #         # Calculate total vehicles for this route and order
-    #         total_vehicles = len(vehicles)
+        # Add rows to the table
+        for (pickup, dropoff, order_name), vehicles in grouped_data.items():
+            # Calculate total vehicles for this route and order
+            total_vehicles = len(vehicles)
 
-    #         for i, vehicle in enumerate(vehicles):
-    #             html_content += "<tr>"
+            for i, vehicle in enumerate(vehicles):
+                html_content += "<tr>"
 
-    #             # Ensure Order ID is only shown once with rowspan
-    #             if i == 0:
-    #                 html_content += f'<td rowspan="{total_vehicles}">{order_name}</td>'
+                # Ensure Order ID is only shown once with rowspan
+                if i == 0:
+                    html_content += f'<td rowspan="{total_vehicles}">{order_name}</td>'
 
-    #             html_content += f"""
-    #                 <td>{vehicle.get('Year', '')} {vehicle.get('Make', '')} {vehicle.get('Model', '')} {vehicle.get('VIN','')}</td>
-    #             """
-    #             if i == 0:
-    #                 html_content += f"""
-    #                 <td rowspan="{total_vehicles}">{pickup}</td>
-    #                 <td rowspan="{total_vehicles}">{dropoff}</td>
-    #                 """
-    #             html_content += """
-    #             </tr>
-    #             """
+                html_content += f"""
+                    <td>{vehicle.get('Year', '')} {vehicle.get('Make', '')} {vehicle.get('Model', '')} {vehicle.get('VIN','')}</td>
+                """
+                if i == 0:
+                    html_content += f"""
+                    <td rowspan="{total_vehicles}">{pickup}</td>
+                    <td rowspan="{total_vehicles}">{dropoff}</td>
+                    """
+                html_content += """
+                </tr>
+                """
 
-    #     # Close the HTML table
-    #     html_content += """
-    #             </tbody>
-    #         </table>
-    #         <p>Please provide your quote at the earliest. Thank you!</p>
-    #         <p>Best Regards,</p>
-    #         <p>Central Fleet Dispatch Team</p>
-    #         <p>Email: orders@centralfleet.ca</p>
-    #         <p>Phone: 438-884-7462</p>
-    #     </body>
-    #     </html>
-    #     """
+        # Close the HTML table
+        html_content += """
+                </tbody>
+            </table>
+            <p>Please provide your quote at the earliest. Thank you!</p>
+            <p>Best Regards,</p>
+            <p>Central Fleet Dispatch Team</p>
+            <p>Email: orders@centralfleet.ca</p>
+            <p>Phone: 438-884-7462</p>
+        </body>
+        </html>
+        """
 
-    #     return html_content
+        return html_content

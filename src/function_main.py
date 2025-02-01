@@ -215,19 +215,17 @@ async def handle_send_quote_request(deal_id: str, email_params : dict, potential
                                                          email_params.get("to").get("user_name"))
 
     email_params["attachment_ids"] = []
-    # email_response = await  send_email(email_params, token, from_module="Deals", from_record_id=deal_id)
-    # if email_response.status_code == 200:
-
-    if 1:
+    email_response = await  send_email(email_params, token, from_module="Deals", from_record_id=deal_id)
+    if email_response.status_code == 200:
         slack_msg = f"""
                     📧📜 {datetime.now()} *Email Sent Successfully!*  \n *Details:* \n - To: `{email_params.get("to").get("user_name")}` \n - Order ID: `{order_details.get('Deal_Name')}` \n - Email Type: `QuoteRequest` \n - Email Subject: '{email_params['subject']}` 
                 """
-        # FunctionalUtils.send_message_to_channel(os.getenv("BOT_TOKEN"), os.getenv("QUOTE_CHANNEL_ID"),slack_msg)
+        FunctionalUtils.send_message_to_channel(os.getenv("BOT_TOKEN"), os.getenv("QUOTE_CHANNEL_ID"),slack_msg)
         ZOHO_API.update_record(moduleName="Potential_Carrier", id=potentialid ,token=token,data={"data":[{"Progress_Status":"Connected"}]})
-        return {"status":"success","message":"Successfully send Quote Request", "data":str("test"),"redirect_url": f"https://crm.zohocloud.ca/crm/org110000402423/tab/Deals/{deal_id}"}
+        return {"status":"success","message":"Successfully send Quote Request", "data":str(email_response.json()),"redirect_url": f"https://crm.zohocloud.ca/crm/org110000402423/tab/Deals/{deal_id}"}
     else:
-        logger.error(f"Error sending email: {"email_response"}")
-        return {"status":"failed","message":"Failed to send Quote Request Email", "error":str("email_response".json())}
+        logger.error(f"Error sending email: {email_response.text}")
+        return {"status":"failed","message":"Failed to send Quote Request Email", "error":str(email_response.json())}
 
 
 
@@ -351,8 +349,7 @@ async def handle_bulk_quote_request(carrier_id: str, email_params: dict, potenti
             })
 
         # Generate HTML content and send email
-        # content = EmailUtils.get_bulk_quote_html(html_data, receiver_name)
-        content = ""
+        content = EmailUtils.get_bulk_quote_html(html_data, receiver_name)
         email_params["html_content"] = content
         email_params['attachment_ids'] = []
 
