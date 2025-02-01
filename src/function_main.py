@@ -351,7 +351,8 @@ async def handle_bulk_quote_request(carrier_id: str, email_params: dict, potenti
             })
 
         # Generate HTML content and send email
-        content = EmailUtils.get_bulk_quote_html(html_data, receiver_name)
+        # content = EmailUtils.get_bulk_quote_html(html_data, receiver_name)
+        content = ""
         email_params["html_content"] = content
         email_params['attachment_ids'] = []
 
