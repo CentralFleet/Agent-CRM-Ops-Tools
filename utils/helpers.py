@@ -224,8 +224,8 @@ class EmailUtils:
         content =  f"""
         <html>
             <body style="font-family: Arial, sans-serif; line-height: 1.6;">
-                <p>Hello <strong>{receiver_name}</strong>,</p>
-                <p>Could you please provide us with your best price for the transport below, along with the earliest pick-up and delivery dates?</p>
+                <p>Dear <strong>{receiver_name}</strong>,</p>
+                <p>We are currently exploring transport options and would appreciate it if you could share your best available rate for the shipment below, along with the earliest possible pick-up and delivery dates.</p>
 
                 <h3 style="color: #333;">Transport Summary</h3>
                 <table style="border-collapse: collapse; width: 100%; table-layout: fixed; border: 1px solid black; margin-bottom: 20px;">
