@@ -38,8 +38,9 @@ async def create_and_send_quote(data):
             pickup_date_range = data.get('EstimatedPickupRange'),
             VendorID = data.get('CarrierID'),
             DealID = data.get('DealID'),
-            Name = data.get("carrierName") + " - " + deal_details.get("Deal_Name"),
-            CreateDate = datetime.now().strftime("%Y-%m-%d")  
+            Name = data.get("CarrierName") + " - " + deal_details.get("Deal_Name"),
+            CreateDate = datetime.now().strftime("%Y-%m-%d"),
+            Customer_Price_Excl_Tax = data.get('CustomerPriceExclTax')
         )
         ## send Quote details to the CRM
         create_quote_response = ZOHO_API.create_record(moduleName="Transport_Offers",data={"data":[dict(new_quote)]},token=token)
@@ -51,7 +52,7 @@ async def create_and_send_quote(data):
             new_sql_quote = {
                 "QuotationRequestID": quote_id,
                 "CarrierID":  data.get('CarrierID'),
-                "CarrierName": data.get("carrierName"),
+                "CarrierName": data.get("CarrierName"),
                 "DropoffLocation":deal_details.get('Drop_off_Location'),
                 "PickupLocation": deal_details.get('PickupLocation'),
                 "EstimatedPickupTime": data.get('EstimatedPickupRange'),
@@ -59,7 +60,8 @@ async def create_and_send_quote(data):
                 "Estimated_Amount": data.get('Estimated_Amount'),
                 "Pickup_City":  deal_details.get("Pickup_City"),
                 "Dropoff_City": deal_details.get("Dropoff_City"),
-                "Tax_Province": deal_details.get("Tax_Province")
+                "Tax_Province": deal_details.get("Tax_Province"),
+                "CustomerPrice_excl_tax": data.get('CustomerPrice_ExclTax')
             }
             sqlquote_response = requests.post(url, json=new_sql_quote)
             return sqlquote_response.json()

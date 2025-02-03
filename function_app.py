@@ -39,12 +39,32 @@ async def get_quote_form(req: func.HttpRequest, context: func.Context) -> func.H
         return func.HttpResponse(html_content, mimetype=mimetype[0])
     except Exception:
         return func.HttpResponse("Internal Server Error", status_code=500)
+    
+
+@app.route(route="bulkquote/form", methods=['GET'])
+async def get_bulk_quote_form(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
+    try:
+        params = {
+            "CarrierID": req.params.get('CarrierID'),
+            "PotentialIDs":"",
+            "CarrierName": req.params.get('CarrierName'),
+            "Pc_Orders": req.params.get('Pc_Orders'),
+        }
+
+        filepath = os.path.join(context.function_directory, "src/static/bulk_quote_form.html")
+        html_content = FunctionalUtils.render_html_template(filepath, params)
+
+        mimetype = mimetypes.guess_type(filepath)
+        return func.HttpResponse(html_content, mimetype=mimetype[0])
+    except Exception:
+        return func.HttpResponse("Internal Server Error", status_code=500)
 
 
 @app.route(route="quote/create", methods=['POST'])
 async def create_quote(req: func.HttpRequest) -> func.HttpResponse:
     try:
         data = req.get_json()
+        logging.info(f"Triggered `create_quote endpoint` with data: {data}")
         response = await create_and_send_quote(data)
         return func.HttpResponse(json.dumps(response), mimetype="application/json",status_code=200)
     except Exception as e:

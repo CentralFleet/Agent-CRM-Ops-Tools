@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Quote Creator</title>
+    <link rel="stylesheet" href="/api/static?filename=bulk_create_quote.css">
+</head>
+<body data-potentialid="{{potentialID}}"  data-carrierid="{{CarrierID}}" data-pcordernames="{{Pc_Orders}}">
+    <div class="quotes-container">
+        <h2 data-carriername="{{CarrierName}}">New Bulk Quote : {{CarrierName}}</h2>
+        <div id="quotes-list"></div>
+        <div class="actions">
+            <button type="button" class="add-quote-btn" onclick="addQuoteForm()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                Add Quote
+            </button>
+            <button type="button" class="submit-all-btn" onclick="submitAllQuotes()">Submit All Quotes</button>
+        </div>
+    </div>
+    <div id="loadingSpinner" class="loading-spinner"></div>
+    <script src="/api/static?filename=bulk_create_quote.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>

@@ -14,5 +14,6 @@ class Quotes(BaseModel):
     Approval_Status	 : Optional[str] = "Not Sent"
     VendorID : Optional[str] = None
     CreateDate: Optional[str] = None
+    Customer_Price_Excl_Tax: Optional[str] = None
 
     

@@ -18,12 +18,14 @@
             </select>
             <input type="text" id="estimatedAmount" placeholder="Enter Estimated Amount">
         </div>
-        
+        <label for="customerPrice">Customer Price (Excl. Tax):</label>
+        <input type="text" id="customerPrice" placeholder="Enter Customer Price">
         <label for="estimatedPickup">Estimated Pickup (Days):</label>
         <div class="range-input">
             <input type="text" id="pickupMin" placeholder="Min (days)" />
             <input type="text" id="pickupMax" placeholder="Max (days)" />
         </div>
+        
         <label for="deliveryDate">Delivery Date (Days):</label>
         <div class="range-input">
             <input type="text" id="deliveryMin" placeholder="Min (days)" />
@@ -34,5 +36,6 @@
     </div>
 
     <script src = "/api/static?filename=create_quote.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>

@@ -9,6 +9,7 @@ function submitQuote() {
     let deliveryMax = document.getElementById('deliveryMax').value;
     var currency_unit = document.getElementById("priceunit").value;
     const carrierName = document.querySelector('h2[data-carriername]').dataset.carriername;
+    let customerprice_excl_tax = document.getElementById('customerPrice').value;
 
     let estimated_pickup = "";
     let DeliveryDate = "";
@@ -66,15 +67,18 @@ function submitQuote() {
     const carrierID = document.body.dataset.carrierid;
     const jobID = document.body.dataset.jobid;
     const potentialID = document.body.dataset.potentialid;
+
+    console.log("Customer Price is ", customerprice_excl_tax);
     const data = {
         Estimated_Amount: estimatedAmount,
         EstimatedPickupRange: estimated_pickup,
         DeliveryDate: DeliveryDate,
         CarrierID: carrierID,
         DealID: jobID,
-        currency: currency_unit,
-        carrierName: carrierName,
-        PotentialID: potentialID
+        Currency: currency_unit,
+        CarrierName: carrierName,
+        PotentialID: potentialID,
+        CustomerPriceExclTax: customerprice_excl_tax
     };
 
     fetch("/api/quote/create", {
@@ -92,13 +96,29 @@ function submitQuote() {
     })
     .then(data => {
         if (data.message) {
-            window.opener.location.href = data.redirect_url;
-            window.close();
+            Swal.fire({
+                icon: "success",
+                title: "Yo!",
+                toast: true,  // Makes it smaller
+                position: "top-end", // Moves to top-right
+                showConfirmButton: false,
+                timer: 2000, // Auto-closes in 2 sec
+                timerProgressBar: true,
+                text: "All Quote has been Created!",
+                confirmButtonText: "OK"
+            }).then(() => {
+                window.opener.location.href = data.redirect_url;
+                window.close();
+            });
         }
     })
     .catch(error => {
         console.error("Error:", error);
-        alert("There was an error submitting the quote: " + error.message);
+        Swal.fire({
+            icon: "error",
+            title: "Failed to Send Email",
+            text: error.message
+        });   
     })
     .finally(() => {
         loadingSpinner.style.display = 'none'; // Hide loading spinner after completion

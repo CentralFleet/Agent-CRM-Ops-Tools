@@ -1,99 +1,112 @@
-  /* Existing CSS */
-  body {
+/* Modernized CSS */
+body {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #eaeaea;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f0f0f0, #d6d6d6);
+    font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
 }
+
 .quote-form {
-    background-color: #ffffff;
-    border-radius: 12px;
-    padding: 30px;
-    width: 400px;
-    height: 400px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 40px;
+    width: 420px;
+    height: auto;
     text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: box-shadow 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
     position: relative;
 }
+
 .quote-form:hover {
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    transform: translateY(-5px);
 }
+
 h2 {
-    color: #333333;
+    color: #333;
     margin-bottom: 25px;
-    font-size: 22px;
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: 700;
 }
+
 #priceunit {
-    width: 25%;
-    padding: 10px;
+    width: 30%;
+    padding: 12px;
     margin-bottom: 20px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    font-size: 15px;
-    margin-right: 5px;
+    font-size: 16px;
+    margin-right: 8px;
     transition: border-color 0.3s ease;
     outline: none;
+    background: #f8f8f8;
 }
-
-
 
 input[type="text"] {
-    width: 90%;
-    padding: 10px;
+    width: 88%;
+    padding: 12px;
     margin-bottom: 20px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 16px;
     transition: border-color 0.3s ease;
     outline: none;
+    background: #f8f8f8;
 }
+
 input[type="text"]:focus {
     border-color: #007bff;
-    box-shadow: 0 0 5px rgba(209, 71, 163, 0.3);
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+    background: #ffffff;
 }
+
 .range-input {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
 }
+
 .range-input input {
-    width: 42%;
+    width: 45%;
     margin-bottom: 0;
 }
+
 button {
     width: 100%;
-    padding: 12px;
-    background-color: #007bff;
+    padding: 14px;
+    background: linear-gradient(135deg, #007bff, #0056b3);
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: all 0.3s ease;
 }
+
 button:hover {
-    background-color: #007bff;
+    background: linear-gradient(135deg, #0056b3, #003f8a);
     transform: translateY(-2px);
 }
+
 button:active {
     transform: translateY(0);
 }
+
 label {
-    color: #555555;
-    font-size: 14px;
+    color: #555;
+    font-size: 15px;
     text-align: left;
     display: block;
     margin-bottom: 8px;
+    font-weight: 500;
 }
 
-/* Loading Spinner CSS */
 /* Loading Spinner CSS */
 .loading-spinner {
     display: none;
@@ -107,8 +120,9 @@ label {
     width: 40px;
     height: 40px;
     animation: spin 1s linear infinite;
-    z-index: 10; /* Ensures it stays on top of other elements */
+    z-index: 10;
 }
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
