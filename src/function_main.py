@@ -69,7 +69,9 @@ async def create_and_send_quote(data):
     quote_crm_response = send_quote_to_crm()
     quote_id = quote_crm_response['data'][0]['details']['id']
     sql_response = send_quote_to_sql(quote_id=quote_id)
-    ZOHO_API.update_record(moduleName="Deals",id=data.get('DealID'),token=token,data={"data":[{"Stage":"Send Quote to Customer","Order_Status":"Quote Ready"}]})
+    if deal_details.get('Stage') in ["Send Quote to Customer", "Shop for Quotes"]:
+        ZOHO_API.update_record(moduleName="Deals",id=data.get('DealID'),token=token,data={"data":[{"Stage":"Send Quote to Customer","Order_Status":"Quote Ready"}]})
+
     ZOHO_API.update_record(moduleName="Potential_Carrier",id=data.get('PotentialID'),token=token,data={"data":[{"Progress_Status":"Quote Received",
                                                                                                                 "Est_Delivery_Date":data.get('DeliveryDate'),
                                                                                                                 "Est_Pickup_Date":data.get('EstimatedPickupRange'),
@@ -91,7 +93,7 @@ async def get_customer_or_carrier_contacts(email_type : str, carrier_id: str = N
         token = TOKEN_INSTANCE.get_access_token()
 
         email_collection = {}
-        if email_type == "Dispatch" or email_type == "QuoteRequest" or email_type == "BulkQuoteRequest":   
+        if email_type in ("Dispatch", "QuoteRequest", "BulkQuoteRequest"):
                     carrier_contacts = ZOHO_API.fetch_related_list(moduleName="Vendors",record_id=carrier_id,token=token,name="Contact")
                     logger.info(carrier_contacts.json())
                     if carrier_contacts.status_code == 200:
@@ -99,7 +101,7 @@ async def get_customer_or_carrier_contacts(email_type : str, carrier_id: str = N
                             email_collection[contact['Email']] = contact['Last_Name']
 
 
-        elif email_type == "SendQuote" or email_type == "SendInvoice":
+        elif email_type in  ("SendQuote","SendInvoice","OrderConfirmation"):
             contacts_resp_v2 = ZOHO_API.fetch_related_list(moduleName="Accounts",record_id=customer_id,token=token,name="DealerContact")
             if contacts_resp_v2.status_code == 204:
                 contacts_resp_v1 = ZOHO_API.fetch_related_list(moduleName="Accounts",record_id=customer_id,token=token,name="Contacts12")
@@ -174,7 +176,7 @@ async def handle_send_dispatch_email(deal_id: str, quote_id: str, email_params :
         email_params["attachment_ids"] = list()
         for attachment in attachments:
             file__name = attachment.get("File_Name")
-            if f"INVOICE-{order_details.get('Deal_Name')}" not in file__name:
+            if file__name.startswith("RF-"):
                 file_id = attachment.get("$file_id")
                 email_params["attachment_ids"].append(file_id)
     except Exception as e:
@@ -379,3 +381,28 @@ async def handle_bulk_quote_request(carrier_id: str, email_params: dict, potenti
         logger.error(f"An error occurred in handle_bulk_quote_request: {e}")
 
         return {"status":"failed","message":"Failed to send Bulk Quote Request Email", "error":str(e)}
+    
+
+
+async def handle_order_confirmation(deal_id: str, email_params : dict):
+
+    token = TOKEN_INSTANCE.get_access_token()
+    order_details = ZOHO_API.read_record(moduleName="Deals", id=deal_id, token=token).json().get("data", [{}])[0]
+    email_params["attachment_ids"] = list()
+    vehicle_details = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Vehicles").json().get("data", [])
+    
+    vehicle_rows = EmailUtils.build_vehicle_rows(vehicle_details)    
+    email_params["subject"] = f"Order Confirmation – Transport Request Received"
+
+                               # Assigned Carrier
+    email_params["html_content"] = EmailUtils.get_order_confirmation_html(order_details, vehicle_rows, email_params.get("to").get("user_name")
+                                                                   )
+    email_response = await send_email(email_params,token, from_module="Deals", from_record_id=deal_id)
+    if email_response.status_code== 200:
+        slack_msg = f""" 
+                        📧 Sucessfully Sent Order Confirmation to {email_params.get("to").get("user_name")}! \n *Details:* \n - Order ID: `{order_details.get("Deal_Name")}` \n - Type: `OrderConfirmation` \n - Subject: `{email_params["subject"]}`"""
+        FunctionalUtils.send_message_to_channel(os.getenv("BOT_TOKEN"), os.getenv("CHANNEL_ID"),slack_msg)
+        return {"status":"success","message":"Successfully send Order Confirmation", "data":str(email_response),"redirect_url": f"https://crm.zohocloud.ca/crm/org110000402423/tab/Deals/{deal_id}"}
+    else:
+        logger.error(f"Error sending email: {email_response.text}")
+        return {"status":"failed","message":"Failed to send Order Confirmation", "error":str(email_response)}

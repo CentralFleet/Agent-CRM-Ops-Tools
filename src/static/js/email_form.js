@@ -37,6 +37,9 @@ if (emailtype == "Dispatch") {
     }else if (emailtype == "BulkQuoteRequest") {
         formTitle.textContent = "New Bulk Quote Request";
         submit_button.textContent = "Send Bulk Request";
+    }else if (emailtype == "OrderConfirmation"){
+        formTitle.textContent = "New Order Confirmation";
+        submit_button.textContent = "Send Confirmation";
     }
 emailDropdown.disabled = true;
 

@@ -149,7 +149,7 @@ class EmailUtils:
     def get_dispatch_content(cls,orderinfo, vehicle_rows,receiver_name,pickup_date,delivery_date,carrierfee):
         pickup_location = orderinfo.get("PickupLocation")
         dropoff_location = orderinfo.get("Drop_off_Location")
-        customer_note = '' if orderinfo.get("Customer_Notes") == None else orderinfo.get("Customer_Notes") 
+        customer_note = '' if orderinfo.get("special_instructon") == None else orderinfo.get("special_instructon") 
         
         try:
             carrierfee = "{:,}".format(int(carrierfee))
@@ -215,6 +215,54 @@ class EmailUtils:
         """
 
         return content
+
+    @classmethod
+    def get_order_confirmation_html(cls,orderinfo, vehicle_rows, receiver_name: str):
+        pickup_location = orderinfo.get("PickupLocation")
+        dropoff_location = orderinfo.get("Drop_off_Location") 
+        customer_note = '' if orderinfo.get("special_instructon") == None else orderinfo.get("special_instructon") 
+        return f"""
+            <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+                <p>Hello <strong>{receiver_name}</strong>,</p>
+                
+                <p>We have received your transport request and will begin processing it shortly. Please find the details of your order below:</p>
+                
+                <h3 style="color: #333;">Transport Summary</h3>
+                <table style="border-collapse: collapse; width: 100%; border: 1px solid black; margin-bottom: 20px;">
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid black; font-weight: bold; background-color: #f1f1f1; width: 35%;">Pick-up Location</td>
+                        <td style="padding: 8px; border: 1px solid black; width: 65%;">{pickup_location}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid black; font-weight: bold; background-color: #f1f1f1; width: 35%;">Drop-off Location</td>
+                        <td style="padding: 8px; border: 1px solid black; width: 65%;">{dropoff_location}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid black; font-weight: bold; background-color: #f1f1f1; width: 35%;">Special Instructions</td>
+                        <td style="padding: 8px; border: 1px solid black; width: 65%;">{customer_note}</td>
+                    </tr>
+                </table>
+                
+                <h3 style="color: #333;">Vehicle Details</h3>
+                <table style="border-collapse: collapse; width: 100%; border: 1px solid black; margin-bottom: 20px;">
+                    <tr style="background-color: #f1f1f1;">
+                        <th style="padding: 10px; border: 1px solid black;">Year</th>
+                        <th style="padding: 10px; border: 1px solid black;">Make</th>
+                        <th style="padding: 10px; border: 1px solid black;">Model</th>
+                        <th style="padding: 10px; border: 1px solid black;">VIN</th>
+                    </tr>
+                    {vehicle_rows}
+                </table>
+                <p>We will keep you informed as your order progresses. If you have any questions or require any changes, please don't hesitate to contact us.</p>
+                
+                <p>Best regards,</p>
+                <p><strong>Central Fleet Dispatch Team</strong></p>
+                <p>Email: orders@centralfleet.ca</p>
+                <p>Phone: 438-884-7462</p>
+            </body>
+            </html>
+            """
 
     @classmethod
     def get_QR_content(cls, orderinfo, vehicle_rows, receiver_name):

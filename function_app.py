@@ -11,7 +11,8 @@ from src.function_main import (
     handle_send_dispatch_email,
     handle_send_quote,
     handle_send_invoice,
-    handle_bulk_quote_request
+    handle_bulk_quote_request,
+    handle_order_confirmation
 )
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -158,7 +159,8 @@ async def send_emails(req: func.HttpRequest, context: func.Context) -> func.Http
             "Dispatch": (handle_send_dispatch_email, ["Deal_ID", "Quote_ID", "email_params"]),
             "SendQuote": (handle_send_quote, ["Deal_ID", "Quote_ID", "email_params", "CustomerPrice_ExclTax"]),
             "SendInvoice": (handle_send_invoice, ["Deal_ID", "Quote_ID", "email_params","Invoiced_Amount"]),
-            "BulkQuoteRequest": (handle_bulk_quote_request, ["Carrier_ID", "email_params", "potentialID"])
+            "BulkQuoteRequest": (handle_bulk_quote_request, ["Carrier_ID", "email_params", "potentialID"]),
+            "OrderConfirmation": (handle_order_confirmation, ["Deal_ID", "email_params", "Carrier_ID"])
         }
 
         # Get the handler and expected arguments
