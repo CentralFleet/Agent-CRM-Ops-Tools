@@ -239,6 +239,8 @@ async def handle_send_quote(deal_id: str, quote_id : str, email_params : dict, c
     vehicle_details = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Vehicles").json().get("data", [])
     
     vehicle_rows = EmailUtils.build_vehicle_rows(vehicle_details)
+
+    # EmailUtils.get_quote_html(order_details, vehicle_rows, email_params.get("to").get("user_name"))
     # email_response = await send_email(email_params, token, from_module="Deals", from_record_id=deal_id)
 
     ZOHO_API.update_record(moduleName="Transport_Offers",id=quote_id,token=token,data={"data":[{"Approval_Status":"Sent","Customer_Price_Excl_Tax":customerprice}]})
@@ -392,7 +394,7 @@ async def handle_order_confirmation(deal_id: str, email_params : dict):
     vehicle_details = ZOHO_API.fetch_related_list(moduleName="Deals",record_id=deal_id,token=token,name="Vehicles").json().get("data", [])
     
     vehicle_rows = EmailUtils.build_vehicle_rows(vehicle_details)    
-    email_params["subject"] = f"Order Confirmation – Transport Request Received"
+    email_params["subject"] = f"Transport Order Received – [{order_details.get('Deal_Name')}]"
 
                                # Assigned Carrier
     email_params["html_content"] = EmailUtils.get_order_confirmation_html(order_details, vehicle_rows, email_params.get("to").get("user_name")
@@ -401,8 +403,17 @@ async def handle_order_confirmation(deal_id: str, email_params : dict):
     if email_response.status_code== 200:
         slack_msg = f""" 
                         📧 Sucessfully Sent Order Confirmation to {email_params.get("to").get("user_name")}! \n *Details:* \n - Order ID: `{order_details.get("Deal_Name")}` \n - Type: `OrderConfirmation` \n - Subject: `{email_params["subject"]}`"""
-        FunctionalUtils.send_message_to_channel(os.getenv("BOT_TOKEN"), os.getenv("CHANNEL_ID"),slack_msg)
+        FunctionalUtils.send_message_to_channel(os.getenv("BOT_TOKEN"), os.getenv("TRANSPORT_CHANNEL_ID"),slack_msg)
         return {"status":"success","message":"Successfully send Order Confirmation", "data":str(email_response),"redirect_url": f"https://crm.zohocloud.ca/crm/org110000402423/tab/Deals/{deal_id}"}
     else:
         logger.error(f"Error sending email: {email_response.text}")
         return {"status":"failed","message":"Failed to send Order Confirmation", "error":str(email_response)}
+    
+
+
+
+# async def is_quote_approved(deal_id : str, quote_id: str, user_selection: str):
+#     if user_selection == "Confirm":
+#         token = TOKEN_INSTANCE.get_access_token()
+#         ZOHO_API.update_record(moduleName="Transport_Offers",id=quote_id,token=token,data={"data":[{"Approval_Status":"Accepted"}]})
+#         ZOHO_API.update_record(moduleName="Deals",id=deal_id,token=token,data={"data":[{"Stage":"Dispatch Order"}]})

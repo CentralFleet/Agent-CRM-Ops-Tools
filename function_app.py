@@ -182,3 +182,18 @@ async def send_emails(req: func.HttpRequest, context: func.Context) -> func.Http
 
 
 
+# @app.route(route="quote/confirm", methods=['POST'])
+# async def confirm_quote(req: func.HttpRequest) -> func.HttpResponse:
+
+#     try:
+#         user_selection = req.params.get('user_selection')
+#         quote_id = req.params.get('quote_id')
+#         if user_selection == "confirm":
+#             ZOHO_API.update_record(moduleName="Transport_Offers",id=quote_id,token=token,data={"data":[{"Approval_Status":"Accepted"}]})
+
+
+
+
+
+#     except Exception as e:
+#         logging.error(f"Error confirming the quote: {e}")

@@ -149,6 +149,7 @@ class EmailUtils:
     def get_dispatch_content(cls,orderinfo, vehicle_rows,receiver_name,pickup_date,delivery_date,carrierfee):
         pickup_location = orderinfo.get("PickupLocation")
         dropoff_location = orderinfo.get("Drop_off_Location")
+        order_id = orderinfo.get("Deal_Name")
         customer_note = '' if orderinfo.get("special_instructon") == None else orderinfo.get("special_instructon") 
         
         try:
@@ -164,6 +165,10 @@ class EmailUtils:
 
                 <h3 style="color: #333;">Transport Summary</h3>
                 <table style="border-collapse: collapse; width: 100%; table-layout: fixed; border: 1px solid black; margin-bottom: 20px;">
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid black; font-weight: bold; background-color: #f1f1f1; width: 35%;">OrderID</td>
+                        <td style="padding: 8px; border: 1px solid black; width: 65%;">{order_id}</td>
+                    </tr>
                     <tr>
                         <td style="padding: 8px; border: 1px solid black; font-weight: bold; background-color: #f1f1f1; color: black; width: 35%;">Pick-up Location</td>
                         <td style="padding: 8px; border: 1px solid black; width: 65%;">{pickup_location}</td>
@@ -220,6 +225,7 @@ class EmailUtils:
     def get_order_confirmation_html(cls,orderinfo, vehicle_rows, receiver_name: str):
         pickup_location = orderinfo.get("PickupLocation")
         dropoff_location = orderinfo.get("Drop_off_Location") 
+        order_id = orderinfo.get("Deal_Name")
         customer_note = '' if orderinfo.get("special_instructon") == None else orderinfo.get("special_instructon") 
         return f"""
             <html>
@@ -230,6 +236,10 @@ class EmailUtils:
                 
                 <h3 style="color: #333;">Transport Summary</h3>
                 <table style="border-collapse: collapse; width: 100%; border: 1px solid black; margin-bottom: 20px;">
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid black; font-weight: bold; background-color: #f1f1f1; width: 35%;">OrderID</td>
+                        <td style="padding: 8px; border: 1px solid black; width: 65%;">{order_id}</td>
+                    </tr>
                     <tr>
                         <td style="padding: 8px; border: 1px solid black; font-weight: bold; background-color: #f1f1f1; width: 35%;">Pick-up Location</td>
                         <td style="padding: 8px; border: 1px solid black; width: 65%;">{pickup_location}</td>
@@ -316,7 +326,7 @@ class EmailUtils:
                 <body style="font-family: Arial, sans-serif; line-height: 1.6;">
                 <p>Dear <strong>{receiver_name}</strong>,</p>
                 <p>Thank you for choosing Central Fleet for your transport needs.</p>
-                <p>Please find your invoice for Order {order_number} attached. If you have any questions or need assistance, feel free to contact us.<p>     
+                <p>Please find your invoice for Order <strong>{order_number}</strong> attached. If you have any questions or need assistance, feel free to contact us.<p>     
                 <p>We appreciate your business and look forward to serving you again.</p>
                 <br>
                 <p>Best regards,</p>
@@ -409,3 +419,102 @@ class EmailUtils:
         """
 
         return html_content
+    
+    # @classmethod
+    # def get_quote_html(cls, orderinfo, vehicle_rows, receiver_name, pickup_date, delivery_date, customer_price, quote_id):
+    #     """
+    #     Generates an HTML email with transport order details, including action buttons for approval.
+
+    #     Args:
+    #         orderinfo (dict): Transport order details.
+    #         vehicle_rows (str): HTML table rows for vehicle details.
+    #         receiver_name (str): Customer's name.
+    #         pickup_date (str): Estimated pickup date.
+    #         delivery_date (str): Estimated delivery date.
+    #         customer_price (str): Price per vehicle.
+    #         quote_id (str): Unique quote ID for API calls.
+
+    #     Returns:
+    #         str: The generated HTML as a string.
+    #     """
+
+    #     pickup_location = orderinfo.get("PickupLocation")
+    #     dropoff_location = orderinfo.get("Drop_off_Location")
+    #     customer_note = orderinfo.get("special_instructon", "")
+
+    #     accept_url = f"https://yourapi.com/quotes/{quote_id}/accept"
+    #     decline_url = f"https://yourapi.com/quotes/{quote_id}/decline"
+
+    #     content = f"""
+    #     <html>
+    #         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    #             <p>Hello <strong>{receiver_name}</strong>,</p>
+    #             <p>We have prepared a transport quote for your review. Please find the details below and let us know if you have any questions.</p>
+
+    #             <h3 style="color: #333;">Transport Summary</h3>
+    #             <table style="border-collapse: collapse; width: 100%; border: 1px solid black; margin-bottom: 20px;">
+    #                 <tr>
+    #                     <td style="padding: 10px; border: 1px solid black; background-color: #f1f1f1; font-weight: bold; width: 35%;">Pick-up Location</td>
+    #                     <td style="padding: 10px; border: 1px solid black; width: 65%;">{pickup_location}</td>
+    #                 </tr>
+    #                 <tr>
+    #                     <td style="padding: 10px; border: 1px solid black; background-color: #f1f1f1; font-weight: bold; width: 35%;">Drop-off Location</td>
+    #                     <td style="padding: 10px; border: 1px solid black; width: 65%;">{dropoff_location}</td>
+    #                 </tr>
+    #                 <tr>
+    #                     <td style="padding: 10px; border: 1px solid black; background-color: #f1f1f1; font-weight: bold; width: 35%;">Special Instructions</td>
+    #                     <td style="padding: 10px; border: 1px solid black; width: 65%;">{customer_note}</td>
+    #                 </tr>
+    #             </table>
+
+    #             <h3 style="color: #333;">Vehicle Details</h3>
+    #             <table style="border-collapse: collapse; width: 100%; border: 1px solid black; margin-bottom: 20px;">
+    #                 <tr style="background-color: #f1f1f1; font-weight: bold;">
+    #                     <th style="padding: 10px; text-align: left; border: 1px solid black;">Year</th>
+    #                     <th style="padding: 10px; text-align: left; border: 1px solid black;">Make</th>
+    #                     <th style="padding: 10px; text-align: left; border: 1px solid black;">Model</th>
+    #                     <th style="padding: 10px; text-align: left; border: 1px solid black;">VIN</th>
+    #                 </tr>
+    #                 {vehicle_rows}
+    #             </table>
+
+    #             <h3 style="color: #333;">ETA & Price</h3>
+    #             <table style="border-collapse: collapse; width: 100%; border: 1px solid black; margin-bottom: 20px;">
+    #                 <tr>
+    #                     <td style="padding: 10px; border: 1px solid black; background-color: #f1f1f1; font-weight: bold; width: 35%;">Est. Pick-up Date</td>
+    #                     <td style="padding: 10px; border: 1px solid black; width: 65%;">{pickup_date}</td>
+    #                 </tr>
+    #                 <tr>
+    #                     <td style="padding: 10px; border: 1px solid black; background-color: #f1f1f1; font-weight: bold; width: 35%;">Est. Delivery Date</td>
+    #                     <td style="padding: 10px; border: 1px solid black; width: 65%;">{delivery_date}</td>
+    #                 </tr>
+    #                 <tr>
+    #                     <td style="padding: 10px; border: 1px solid black; background-color: #f1f1f1; font-weight: bold; width: 35%;">Price Per Vehicle</td>
+    #                     <td style="padding: 10px; border: 1px solid black; width: 65%;">${customer_price}</td>
+    #                 </tr>
+    #             </table>
+
+    #             <p>To proceed, please select one of the options below:</p>
+
+    #             <div style="text-align: center; margin: 20px 0;">
+    #                 <a href="{accept_url}" 
+    #                    style="background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; font-size: 16px; border-radius: 5px; margin-right: 10px;">
+    #                    Accept Quote
+    #                 </a>
+                    
+    #                 <a href="{decline_url}" 
+    #                    style="background-color: #dc3545; color: white; padding: 12px 24px; text-decoration: none; font-size: 16px; border-radius: 5px;">
+    #                    Decline Quote
+    #                 </a>
+    #             </div>
+
+    #             <p>If you have any questions, feel free to reach out.</p>
+
+    #             <p>Best regards,</p>
+    #             <p><strong>Central Fleet Dispatch Team</strong></p>
+    #             <p>Email: <a href="mailto:orders@centralfleet.ca">orders@centralfleet.ca</a></p>
+    #             <p>Phone: <a href="tel:4388847462">438-884-7462</a></p>
+    #         </body>
+    #     </html>
+    #     """
+    #     return content
