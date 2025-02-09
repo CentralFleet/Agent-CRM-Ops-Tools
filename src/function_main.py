@@ -549,7 +549,7 @@ async def request_order_update(deal_ids: str, email_params : dict, carrier_id : 
                         📧📜 {datetime.now()} *Email Sent Successfully!*  \n *Details:* \n - To: `{email_params.get("to").get("user_name")}` \n - Email Type: `OrderRequest` \n - Email Subject: '{email_params['subject']}` 
                     """
             FunctionalUtils.send_message_to_channel(os.getenv("BOT_TOKEN"), os.getenv("TRACKING_CHANNEL_ID"), slack_msg)
-            return {"status":"success","message":"Successfully send Order Update Email", "data":str(email_response.json()),"redirect_url": f"https://crm.zohocloud.ca/crm/org110000402423/tab/Accounts/{carrier_id}"}
+            return {"status":"success","message":"Successfully send Order Update Email", "data":str(email_response.json()),"redirect_url": f"https://crm.zohocloud.ca/crm/org110000402423/tab/Vendors/{carrier_id}"}
         
         else:
             logger.error(f"Error sending email: {email_response.text}")
