@@ -88,20 +88,20 @@ async def create_and_send_quote(data):
 
 
 async def get_customer_or_carrier_contacts(email_type : str, carrier_id: str = None, customer_id : str = None):
-    logger.info(f"Triggered `get_contacts` for email type: {email_type} and {carrier_id}")
+    logger.info(f"Triggered `get_contacts` for email type: {email_type} and {carrier_id} and {customer_id}")
     try:
         token = TOKEN_INSTANCE.get_access_token()
 
         email_collection = {}
-        if email_type in ("Dispatch", "QuoteRequest", "BulkQuoteRequest"):
-                    carrier_contacts = ZOHO_API.fetch_related_list(moduleName="Vendors",record_id=carrier_id,token=token,name="Contact")
-                    logger.info(carrier_contacts.json())
-                    if carrier_contacts.status_code == 200:
-                        for contact in carrier_contacts.json()['data']:
-                            email_collection[contact['Email']] = contact['Last_Name']
+        if email_type in ("Dispatch", "QuoteRequest", "BulkQuoteRequest","RequestOrderUpdate"):
+            carrier_contacts = ZOHO_API.fetch_related_list(moduleName="Vendors",record_id=carrier_id,token=token,name="Contact")
+            logger.info(carrier_contacts.json())
+            if carrier_contacts.status_code == 200:
+                for contact in carrier_contacts.json()['data']:
+                    email_collection[contact['Email']] = contact['Last_Name']
 
 
-        elif email_type in  ("SendQuote","SendInvoice","OrderConfirmation"):
+        elif email_type in  ("SendQuote","SendInvoice","OrderConfirmation","SendOrderUpdate"):
             contacts_resp_v2 = ZOHO_API.fetch_related_list(moduleName="Accounts",record_id=customer_id,token=token,name="DealerContact")
             if contacts_resp_v2.status_code == 204:
                 contacts_resp_v1 = ZOHO_API.fetch_related_list(moduleName="Accounts",record_id=customer_id,token=token,name="Contacts12")
@@ -409,6 +409,156 @@ async def handle_order_confirmation(deal_id: str, email_params : dict):
         logger.error(f"Error sending email: {email_response.text}")
         return {"status":"failed","message":"Failed to send Order Confirmation", "error":str(email_response)}
     
+
+async def send_order_update(deal_ids: str, email_params : dict, customer_id : str):
+    try:
+        deal_ids_list = deal_ids.split("|||") ## orders
+        logger.info(f"Number of Order to be sent as Update: {len(deal_ids_list)}")
+        
+        token = TOKEN_INSTANCE.get_access_token()
+        receiver_name = email_params.get("to").get("user_name") 
+
+        
+        
+        order_tasks = []
+        vehicle_tasks = []
+        for deal_id in deal_ids_list:
+            order_tasks.append(asyncio.to_thread(ZOHO_API.read_record,moduleName="Deals",id=deal_id,token=token))
+            vehicle_tasks.append(asyncio.to_thread(ZOHO_API.fetch_related_list, moduleName="Deals", record_id=deal_id, token=token, name="Vehicles"))
+
+        # Run all order and vehicle tasks concurrently
+        order_responses = await asyncio.gather(*order_tasks)
+        vehicle_responses = await asyncio.gather(*vehicle_tasks)
+        # Process the responses
+       
+
+        html_data = []
+        for order_response, vehicle_response in zip(order_responses, vehicle_responses):
+            logger.info(f"Order response type: {type(order_responses)}")
+            logger.info(f"Vehicle response type: {type(vehicle_response)}")
+            order_data = order_response.json().get("data", [{}])[0]
+            logger.info(f"Order data: {order_data}")
+            order_id = order_data.get("Deal_Name")
+            createtime = order_data.get("Created_Time")
+            order_status = order_data.get("Order_Status")
+            pickup_location = order_data.get("PickupLocation")
+            drop_off_location = order_data.get("Drop_off_Location")
+            logger.info(f"Pickup Location: {pickup_location} and Drop Off Location: {drop_off_location}")
+
+            vehicles_data = vehicle_response.json().get("data", [])
+            if createtime:
+                    createtime = datetime.fromisoformat(createtime[:19]).strftime("%Y-%m-%d")
+                    
+            # Append data for HTML content
+            html_data.append({
+                "CreateTime":createtime,
+                "OrderName": order_id,
+                "PickupLocation": pickup_location,
+                "DropoffLocation": drop_off_location,
+                "ETA": order_data.get("Delivery_Date_Range"),
+                "Vehicles": vehicles_data
+            })
+        logger.info(html_data)
+        order_row = EmailUtils.build_order_rows(html_data,for_request=True)
+        email_params["html_content"] = EmailUtils.get_send_order_update_html(receiver_name, order_row)
+        email_params['subject'] = "Update on Your Transport Orders"
+        email_params['attachment_ids'] = []
+
+        email_response = await send_email(email_params, token, from_module="Accounts", from_record_id=customer_id)
+
+
+        if email_response.status_code == 200:
+            slack_msg = f"""
+                        📧📜 {datetime.now()} *Email Sent Successfully!*  \n *Details:* \n - To: `{email_params.get("to").get("user_name")}` \n - Email Type: `OrderUpdate` \n - Email Subject: '{email_params['subject']}` 
+                    """
+            FunctionalUtils.send_message_to_channel(os.getenv("BOT_TOKEN"), os.getenv("TRACKING_CHANNEL_ID"),slack_msg)
+            return {"status":"success","message":"Successfully send Order Update Email", "data":str(email_response.json()),"redirect_url": f"https://crm.zohocloud.ca/crm/org110000402423/tab/Accounts/{customer_id}"}
+        
+        else:
+            logger.error(f"Error sending email: {email_response.text}")
+            return {"status":"failed","message":"Failed to send Order Update Email", "error":str(email_response.json())}
+
+
+    except Exception as e:
+        logger.error(f"An error occurred in send_order_update: {e}")
+
+        return {"status":"failed","message":"Failed to send Order Update Email", "error":str(e)}
+
+
+
+async def request_order_update(deal_ids: str, email_params : dict, carrier_id : str):
+    try:
+        deal_ids_list = deal_ids.split("|||") ## orderss
+        logger.info(f" Carrier ID {carrier_id}")
+        logger.info(f"Number of Order to be sent as Update: {len(deal_ids_list)}")
+        
+        token = TOKEN_INSTANCE.get_access_token()
+        receiver_name = email_params.get("to").get("user_name") 
+
+        
+        
+        order_tasks = []
+        vehicle_tasks = []
+        for deal_id in deal_ids_list:
+            order_tasks.append(asyncio.to_thread(ZOHO_API.read_record,moduleName="Deals",id=deal_id,token=token))
+            vehicle_tasks.append(asyncio.to_thread(ZOHO_API.fetch_related_list, moduleName="Deals", record_id=deal_id, token=token, name="Vehicles"))
+
+        # Run all order and vehicle tasks concurrently
+        order_responses = await asyncio.gather(*order_tasks)
+        vehicle_responses = await asyncio.gather(*vehicle_tasks)
+        # Process the responses
+        
+
+        html_data = []
+        for order_response, vehicle_response in zip(order_responses, vehicle_responses):
+            logger.info(f"Order response type: {type(order_responses)}")
+            logger.info(f"Vehicle response type: {type(vehicle_response)}")
+            order_data = order_response.json().get("data", [{}])[0]
+            logger.info(f"Order data: {order_data}")
+            order_id = order_data.get("Deal_Name")
+            createtime = order_data.get("Created_Time")
+            order_status = order_data.get("Order_Status")
+            pickup_location = order_data.get("PickupLocation")
+            drop_off_location = order_data.get("Drop_off_Location")
+            logger.info(f"Pickup Location: {pickup_location} and Drop Off Location: {drop_off_location}")
+
+            vehicles_data = vehicle_response.json().get("data", [])
+            if createtime:
+                    createtime = datetime.fromisoformat(createtime[:19]).strftime("%Y-%m-%d")
+                    
+            # Append data for HTML content
+            html_data.append({
+                "CreateTime":createtime,
+                "OrderName": order_id,
+                "PickupLocation": pickup_location,
+                "DropoffLocation": drop_off_location,
+                "Vehicles": vehicles_data
+            })
+        logger.info(html_data)
+        order_row = EmailUtils.build_order_rows(html_data)
+        email_params["html_content"] = EmailUtils.get_order_update_request_html(receiver_name, order_row)
+        email_params['subject'] = "Request for ETA Updates on Transport Orders"
+        email_params['attachment_ids'] = []
+        
+
+        email_response = await send_email(email_params, token, from_module="Vendors", from_record_id=carrier_id)
+
+
+        if email_response.status_code == 200:
+            slack_msg = f"""
+                        📧📜 {datetime.now()} *Email Sent Successfully!*  \n *Details:* \n - To: `{email_params.get("to").get("user_name")}` \n - Email Type: `OrderRequest` \n - Email Subject: '{email_params['subject']}` 
+                    """
+            FunctionalUtils.send_message_to_channel(os.getenv("BOT_TOKEN"), os.getenv("TRACKING_CHANNEL_ID"), slack_msg)
+            return {"status":"success","message":"Successfully send Order Update Email", "data":str(email_response.json()),"redirect_url": f"https://crm.zohocloud.ca/crm/org110000402423/tab/Accounts/{carrier_id}"}
+        
+        else:
+            logger.error(f"Error sending email: {email_response.text}")
+            return {"status":"failed","message":"Failed to send Order Update Email", "error":str(email_response.json())}
+
+    except Exception as e:
+        logger.error(f"An error occurred in send_order_update: {e}")
+
+        return {"status":"failed","message":"Failed to send Order Update Email", "error":str(e)}
 
 
 

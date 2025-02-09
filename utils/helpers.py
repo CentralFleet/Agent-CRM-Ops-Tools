@@ -145,6 +145,38 @@ class EmailUtils:
             """
         return rows
 
+    @classmethod 
+    def build_order_rows(cls, transport_orders, for_request=False):
+        rows = ""
+        for order in transport_orders:
+            order_date = order.get("CreateTime", "")
+            for vehicle in order.get("Vehicles", []):
+                vin = vehicle.get("VIN", "")
+                vehicle_details = f"{vehicle.get('Year', '')} {vehicle.get('Make', '')} {vehicle.get('Model', '')}"
+                pickup_location = order.get("PickupLocation", "")
+                dropoff_location = order.get("DropoffLocation", "")
+                transport_status = vehicle.get("Order_Status", "")
+                eta = order.get("ETA", "")
+
+                rows += f"""
+                <tr>
+                    <td style="border: 1px solid black; padding: 8px;">{order_date}</td>
+                    <td style="border: 1px solid black; padding: 8px;">{vin}</td>
+                    <td style="border: 1px solid black; padding: 8px;">{vehicle_details}</td>
+                    <td style="border: 1px solid black; padding: 8px;">{pickup_location}</td>
+                    <td style="border: 1px solid black; padding: 8px;">{dropoff_location}</td>
+                    <td style="border: 1px solid black; padding: 8px;">{transport_status}</td>
+                   
+                """
+                if for_request:
+                    rows += """
+                    <td style="border: 1px solid black; padding: 8px;">{eta}</td>
+                    """.format(eta=eta)
+            
+                rows += "</tr>"
+                
+        return rows
+
     @classmethod
     def get_dispatch_content(cls,orderinfo, vehicle_rows,receiver_name,pickup_date,delivery_date,carrierfee):
         pickup_location = orderinfo.get("PickupLocation")
@@ -419,6 +451,148 @@ class EmailUtils:
         """
 
         return html_content
+    
+    @classmethod
+    def get_send_order_update_html(cls, customer_name, order_rows):
+        # rows = EmailUtils.build_transport_rows(transport_orders)
+        
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    line-height: 1.5;
+                }}
+                table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 10px;
+                }}
+                th, td {{
+                    border: 1px solid black;
+                    padding: 8px;
+                    text-align: left;
+                }}
+                th {{
+                    background-color: #f4f4f4;
+                    font-weight: bold;
+                }}
+                .email-header {{
+                    font-size: 18px;
+                    font-weight: bold;
+                }}
+            </style>
+        </head>
+        <body>
+
+            <p><strong>Hello {customer_name},</strong></p>
+
+            <p>Here is an update on the following transport orders:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order Date</th>
+                        <th>VIN Number</th>
+                        <th>Vehicle Details</th>
+                        <th>Pickup Location</th>
+                        <th>Drop-off Location</th>
+                        <th>Transport Status</th>
+                        <th>ETA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {order_rows}
+                </tbody>
+            </table>
+
+            <p>Please let us know if you need any further details.</p>
+            <p>Best Regards,</p>
+            <p>Central Fleet Dispatch Team</p>
+            <p>Email: orders@centralfleet.ca</p>
+            <p>Phone: 438-884-7462</p>
+            
+        </body>
+        </html>
+        """
+
+        return html_content
+    
+    @classmethod
+    def get_order_update_request_html(cls, carrier_name, order_rows):
+            
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    line-height: 1.5;
+                }}
+                table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 10px;
+                }}
+                th, td {{
+                    border: 1px solid black;
+                    padding: 8px;
+                    text-align: left;
+                }}
+                th {{
+                    background-color: #f4f4f4;
+                    font-weight: bold;
+                }}
+                .email-header {{
+                    font-size: 18px;
+                    font-weight: bold;
+                }}
+            </style>
+        </head>
+        <body>
+
+            <p><strong>Hello {carrier_name},</strong></p>
+
+            <p>Could you kindly provide an update on the estimated arrival times for the following transport orders?</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order Date</th>
+                        <th>VIN Number</th>
+                        <th>Vehicle Details</th>
+                        <th>Pickup Location</th>
+                        <th>Drop-off Location</th>
+                        <th>Current Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {order_rows}
+                </tbody>
+            </table>
+
+            <p>Please let us know if you need any further details.Your assistance is greatly appreciated.</p><br>
+            <p>Looking forward to your response.</p>
+        </body>
+        </html>
+
+        <p>Best Regards,</p>
+        <p>Central Fleet Dispatch Team</p>
+        <p>Email: orders@centralfleet.ca</p>
+        <p>Phone: 438-884-7462</p>
+        """
+
+        return html_content
+
+
+
     
     # @classmethod
     # def get_quote_html(cls, orderinfo, vehicle_rows, receiver_name, pickup_date, delivery_date, customer_price, quote_id):

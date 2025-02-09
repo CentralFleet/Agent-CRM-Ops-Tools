@@ -40,7 +40,15 @@ if (emailtype == "Dispatch") {
     }else if (emailtype == "OrderConfirmation"){
         formTitle.textContent = "New Order Confirmation";
         submit_button.textContent = "Send Confirmation";
+    }else if (emailtype == "SendOrderUpdate"){
+        formTitle.textContent = "New Order Update";
+        submit_button.textContent = "Send Update";
+        
+    }else if (emailtype == "RequestOrderUpdate"){
+        formTitle.textContent = "Request Order Update";
+        submit_button.textContent = "Request Update";
     }
+
 emailDropdown.disabled = true;
 
 // Function to fetch customer contacts
@@ -118,7 +126,8 @@ function SendEmail() {
         ToName : toname,
         CustomerPrice_ExclTax : customerprice,
         Invoiced_Amount : invoiced_amount,
-        potentialID : potentialID
+        potentialID : potentialID,
+        CustomerID:customerid
 
     };
 
