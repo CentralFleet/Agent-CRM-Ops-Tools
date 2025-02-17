@@ -46,7 +46,7 @@ async def create_and_send_quote(data):
                 VendorID=data.get('CarrierID'),
                 DealID=data.get('DealID'),
                 Name=f"{data.get('CarrierName')} - {deal_details.get('Deal_Name')}",
-                CreateDate=datetime.datetime.now().strftime("%Y-%m-%d"),
+                CreateDate=datetime.now().strftime("%Y-%m-%d"),
                 Customer_Price_Excl_Tax=data.get('CustomerPriceExclTax')
             )
             create_quote_response = ZOHO_API.create_record(moduleName="Transport_Offers", data={"data": [dict(new_quote)]}, token=token)
