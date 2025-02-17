@@ -20,76 +20,96 @@ TOKEN_INSTANCE =  TokenManager(
 
 ZOHO_API = ZohoApi(base_url="https://www.zohoapis.ca/crm/v2")
 
+import requests
+import logging
 
 async def create_and_send_quote(data):
     token = TOKEN_INSTANCE.get_access_token()
     logger.info(f"Triggered `send_quote_to_crm_and_sql` with data: {data}")
     
-    ## Fetch Deal Details
-    deal_info = ZOHO_API.read_record(moduleName="Deals",id=data.get('DealID'),token=token).json()
-    deal_details = deal_info.get('data', [{}])[0]
-
-    def send_quote_to_crm():
-        new_quote = Quotes(
-            Estimated_Amount = data.get('Estimated_Amount'),
-            Delivery_Date_Range = data.get('DeliveryDate'),
-            Dropoff_Location = deal_details.get('Drop_off_Location'),
-            Pickup_Location  = deal_details.get('PickupLocation'),
-            pickup_date_range = data.get('EstimatedPickupRange'),
-            VendorID = data.get('CarrierID'),
-            DealID = data.get('DealID'),
-            Name = data.get("CarrierName") + " - " + deal_details.get("Deal_Name"),
-            CreateDate = datetime.now().strftime("%Y-%m-%d"),
-            Customer_Price_Excl_Tax = data.get('CustomerPriceExclTax')
-        )
-        ## send Quote details to the CRM
-        create_quote_response = ZOHO_API.create_record(moduleName="Transport_Offers",data={"data":[dict(new_quote)]},token=token)
-        logger.info(f"CREATE QUOTE RESPONSE : {create_quote_response.json()}")
-        return create_quote_response.json()
-
-    def send_quote_to_sql(quote_id):
-            url = "https://lead-quote-service.azurewebsites.net/api/v1/store-quotes?"  ## forward request to transport service to add quote into db
+    try:
+        # Fetch Deal Details
+        deal_info = ZOHO_API.read_record(moduleName="Deals", id=data.get('DealID'), token=token).json()
+        deal_details = deal_info.get('data', [{}])[0]
+    except Exception as e:
+        logger.error(f"Failed to fetch deal details: {e}", exc_info=True)
+        return {"status": "error", "code": 500, "message": "Failed to retrieve deal details."}
+    
+    try:
+        def send_quote_to_crm():
+            new_quote = Quotes(
+                Estimated_Amount=data.get('Estimated_Amount'),
+                Delivery_Date_Range=data.get('DeliveryDate'),
+                Dropoff_Location=deal_details.get('Drop_off_Location'),
+                Pickup_Location=deal_details.get('PickupLocation'),
+                pickup_date_range=data.get('EstimatedPickupRange'),
+                VendorID=data.get('CarrierID'),
+                DealID=data.get('DealID'),
+                Name=f"{data.get('CarrierName')} - {deal_details.get('Deal_Name')}",
+                CreateDate=datetime.datetime.now().strftime("%Y-%m-%d"),
+                Customer_Price_Excl_Tax=data.get('CustomerPriceExclTax')
+            )
+            create_quote_response = ZOHO_API.create_record(moduleName="Transport_Offers", data={"data": [dict(new_quote)]}, token=token)
+            response_json = create_quote_response.json()
+            logger.info(f"CREATE QUOTE RESPONSE : {response_json}")
+            return response_json
+        
+        quote_crm_response = send_quote_to_crm()
+        quote_id = quote_crm_response.get('data', [{}])[0].get('details', {}).get('id')
+        if not quote_id:
+            raise ValueError("Quote ID not returned from CRM response")
+    except Exception as e:
+        logger.error(f"Failed to create quote in CRM: {e}", exc_info=True)
+        return {"status": "error", "code": 500, "message": "Failed to create quote in CRM."}
+    
+    try:
+        def send_quote_to_sql(quote_id):
+            url = "https://lead-quote-service.azurewebsites.net/api/v1/store-quotes?"
             new_sql_quote = {
                 "QuotationRequestID": quote_id,
-                "CarrierID":  data.get('CarrierID'),
+                "CarrierID": data.get('CarrierID'),
                 "CarrierName": data.get("CarrierName"),
-                "DropoffLocation":deal_details.get('Drop_off_Location'),
+                "DropoffLocation": deal_details.get('Drop_off_Location'),
                 "PickupLocation": deal_details.get('PickupLocation'),
                 "EstimatedPickupTime": data.get('EstimatedPickupRange'),
                 "EstimatedDropoffTime": data.get('DeliveryDate'),
                 "Estimated_Amount": data.get('Estimated_Amount'),
-                "Pickup_City":  deal_details.get("Pickup_City"),
+                "Pickup_City": deal_details.get("Pickup_City"),
                 "Dropoff_City": deal_details.get("Dropoff_City"),
                 "Tax_Province": deal_details.get("Tax_Province"),
-                "CustomerPrice_excl_tax": data.get('CustomerPrice_ExclTax')
+                "CustomerPrice_excl_tax": data.get('CustomerPriceExclTax')
             }
             sqlquote_response = requests.post(url, json=new_sql_quote)
             return sqlquote_response.json()
-
-    quote_crm_response = send_quote_to_crm()
-    quote_id = quote_crm_response['data'][0]['details']['id']
-    sql_response = send_quote_to_sql(quote_id=quote_id)
+        
+        sql_response = send_quote_to_sql(quote_id)
+    except Exception as e:
+        logger.error(f"Failed to store quote in SQL: {e}", exc_info=True)
+        return {"status": "error", "code": 500, "message": "Failed to store quote in SQL."}
+    
     try:
         if deal_details.get('Stage') in ["Send Quote to Customer", "Shop for Quotes"]:
-            ZOHO_API.update_record(moduleName="Deals",id=data.get('DealID'),token=token,data={"data":[{"Stage":"Send Quote to Customer","Order_Status":"Quote Ready"}]})
-
-        ZOHO_API.update_record(moduleName="Potential_Carrier",id=data.get('PotentialID'),token=token,data={"data":[{"Progress_Status":"Quote Received",
-                                                                                                                    "Est_Delivery_Date":data.get('DeliveryDate'),
-                                                                                                                    "Est_Pickup_Date":data.get('EstimatedPickupRange'),
-                                                                                                                    "Estimated_Amount":data.get('Estimated_Amount')}]} )
-    except Exception as e:
-        logger.warning(f"Error updating deal stage or potential carrier: {e}")
+            ZOHO_API.update_record(moduleName="Deals", id=data.get('DealID'), token=token, data={"data": [{"Stage": "Send Quote to Customer", "Order_Status": "Quote Ready"}]})
         
+        ZOHO_API.update_record(moduleName="Potential_Carrier", id=data.get('PotentialID'), token=token, data={"data": [{
+            "Progress_Status": "Quote Received",
+            "Est_Delivery_Date": data.get('DeliveryDate'),
+            "Est_Pickup_Date": data.get('EstimatedPickupRange'),
+            "Estimated_Amount": data.get('Estimated_Amount')
+        }]})
+    except Exception as e:
+        logger.warning(f"Error updating deal stage or potential carrier: {e}", exc_info=True)
+    
     return {
-            "status":"success",
-            "quote_create_response":{
-                "crm_response":quote_crm_response,
-                "sql_response":sql_response
-            },
-        "message": "Quote created successfully", 
+        "status": "success",
+        "code": 200,
+        "quote_create_response": {
+            "crm_response": quote_crm_response,
+            "sql_response": sql_response
+        },
+        "message": "Quote created successfully",
         "redirect_url": f"https://crm.zohocloud.ca/crm/org110000402423/tab/Deals/{data.get('DealID')}"
     }
-
 
 async def get_customer_or_carrier_contacts(email_type : str, carrier_id: str = None, customer_id : str = None):
     logger.info(f"Triggered `get_contacts` for email type: {email_type} and {carrier_id} and {customer_id}")
