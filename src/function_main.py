@@ -39,7 +39,7 @@ async def create_and_send_quote(data):
         def send_quote_to_crm():
             new_quote = Quotes(
                 Estimated_Amount=data.get('Estimated_Amount'),
-                Delivery_Date_Range=data.get('DeliveryDate'),
+                Delivery_Date_Range=data.get('DeliveryDateRange'),
                 Dropoff_Location=deal_details.get('Drop_off_Location'),
                 Pickup_Location=deal_details.get('PickupLocation'),
                 pickup_date_range=data.get('EstimatedPickupRange'),
@@ -72,7 +72,7 @@ async def create_and_send_quote(data):
                 "DropoffLocation": deal_details.get('Drop_off_Location'),
                 "PickupLocation": deal_details.get('PickupLocation'),
                 "EstimatedPickupTime": data.get('EstimatedPickupRange'),
-                "EstimatedDropoffTime": data.get('DeliveryDate'),
+                "EstimatedDropoffTime": data.get('DeliveryDateRange'),
                 "Estimated_Amount": data.get('Estimated_Amount'),
                 "Pickup_City": deal_details.get("Pickup_City"),
                 "Dropoff_City": deal_details.get("Dropoff_City"),
@@ -93,7 +93,7 @@ async def create_and_send_quote(data):
         
         ZOHO_API.update_record(moduleName="Potential_Carrier", id=data.get('PotentialID'), token=token, data={"data": [{
             "Progress_Status": "Quote Received",
-            "Est_Delivery_Date": data.get('DeliveryDate'),
+            "Est_Delivery_Date": data.get('DeliveryDateRange'),
             "Est_Pickup_Date": data.get('EstimatedPickupRange'),
             "Estimated_Amount": data.get('Estimated_Amount')
         }]})
