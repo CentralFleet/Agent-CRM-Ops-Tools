@@ -69,7 +69,12 @@ async def create_quote(req: func.HttpRequest) -> func.HttpResponse:
         data = req.get_json()
         logging.info(f"Triggered `create_quote endpoint` with data: {data}")
         response = await create_and_send_quote(data)
-        return func.HttpResponse(json.dumps(response), mimetype="application/json",status_code=200)
+
+        if response['code'] == 200:
+            return func.HttpResponse(json.dumps(response), mimetype="application/json",status_code=200)
+        else:
+            return func.HttpResponse(json.dumps(response), mimetype="application/json", status_code=500)
+        
     except Exception as e:
         logging.error(f"Error creating the quote: {e}")
         error_data = {"error": str(e)}
