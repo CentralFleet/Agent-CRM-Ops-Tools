@@ -88,8 +88,8 @@ async def create_and_send_quote(data):
         return {"status": "error", "code": 500, "message": "Failed to store quote in SQL."}
     
     try:
-        if deal_details.get('Stage') in ["Send Quote to Customer", "Shop for Quotes"]:
-            ZOHO_API.update_record(moduleName="Deals", id=data.get('DealID'), token=token, data={"data": [{"Stage": "Send Quote to Customer", "Order_Status": "Quote Ready"}]})
+        # if deal_details.get('Stage') in ["Send Quote to Customer", "Shop for Quotes"]:
+        #     ZOHO_API.update_record(moduleName="Deals", id=data.get('DealID'), token=token, data={"data": [{"Stage": "Send Quote to Customer", "Order_Status": "Quote Ready"}]})
         
         ZOHO_API.update_record(moduleName="Potential_Carrier", id=data.get('PotentialID'), token=token, data={"data": [{
             "Progress_Status": "Quote Received",
@@ -224,7 +224,7 @@ async def handle_send_dispatch_email(deal_id: str, quote_id: str, email_params :
         FunctionalUtils.send_message_to_channel(os.getenv("BOT_TOKEN"), os.getenv("DISPATCH_CHANNEL_ID"),slack_msg)
 
         response = ZOHO_API.update_record(moduleName="Transport_Offers",id=quote_id,data={"data":[{"Approval_Status":"Accepted"}]},token=token)
-        ZOHO_API.update_record(moduleName="Deals",id=deal_id,data={"data":[{"Stage":"Send Invoice",**assigned_carrier}]},token=token)
+        ZOHO_API.update_record(moduleName="Deals",id=deal_id,data={"data":[{"Order_Status":"Awaiting Pickup",**assigned_carrier}]},token=token)
         return {"status":"success","message":"Successfully send Dispatch Email", "data":str(email_response),"redirect_url": f"https://crm.zohocloud.ca/crm/org110000402423/tab/Deals/{deal_id}"}
     else:
         logger.error(f"Error sending email: {email_response.text}")
@@ -268,7 +268,7 @@ async def handle_send_quote(deal_id: str, quote_id : str, email_params : dict, c
     # email_response = await send_email(email_params, token, from_module="Deals", from_record_id=deal_id)
 
     ZOHO_API.update_record(moduleName="Transport_Offers",id=quote_id,token=token,data={"data":[{"Approval_Status":"Sent","Customer_Price_Excl_Tax":customerprice}]})
-    ZOHO_API.update_record(moduleName="Deals",id=deal_id,token=token,data={"data":[{"Stage":"Await Customer Approval"}]})
+    ZOHO_API.update_record(moduleName="Deals",id=deal_id,token=token,data={"data":[{"Order_Status":"Ready to Book"}]})
 
     email_params["subject"] = f"Transport Quote: [{order_details.get('PickupLocation')} -> {order_details.get('Drop_off_Location')}]"
 
@@ -314,7 +314,7 @@ async def handle_send_invoice(deal_id: str, quote_id: str, email_params : dict, 
     email_response = await send_email(email_params,token, from_module="Deals", from_record_id=deal_id)
 
     if email_response.status_code == 200:
-        ZOHO_API.update_record(moduleName="Deals",id=deal_id,token=token,data={"data":[{"Stage":"Confirm Delivery"}]})
+        # ZOHO_API.update_record(moduleName="Deals",id=deal_id,token=token,data={"data":[{"Stage":"Confirm Delivery"}]})
         slack_msg = f"""
                     📧💸 Sucessfully Sent Invoice to {email_params.get("to").get("user_name")}!  \n *Details:* \n - Order ID: `{order_id}` \n - Invoiced Amount (Per Vehicle): `CAD {invoice_amount}` \n - Volumn : `{len(vehicle_details)} Vehicles` \n <{url}|View Invoice>
                     """
